@@ -1,0 +1,17 @@
+{
+  "name": "foundry-models-example",
+  "version": "1.0.0",
+  "description": "Foundry Models Responses API example using the standard OpenAI SDK",
+  "type": "module",
+  "scripts": {
+    "start": "npx tsx responses_example.ts"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.0.0",
+    "openai": "^4.80.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.0.0",
+    "@types/node": "^22.0.0"
+  }
+}
