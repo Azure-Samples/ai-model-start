@@ -345,7 +345,7 @@ All models currently available on Microsoft Foundry that support the [Responses 
 
 | Model | Version(s) | Availability |
 |---|---|---|
-| codex-mini | 2025-05-16 | 2/23 regions |
+| codex-mini | 2025-05-16 | eastus2, swedencentral |
 | gpt-4 | 0613 | 22/23 regions |
 | gpt-4-32k | 0613 | 20/23 regions |
 | gpt-4.1 | 2025-04-14 | All regions |
@@ -353,15 +353,15 @@ All models currently available on Microsoft Foundry that support the [Responses 
 | gpt-4.1-nano | 2025-04-14 | All regions |
 | gpt-4o | 2024-05-13, 2024-08-06, 2024-11-20 | All regions |
 | gpt-4o-mini | 2024-07-18 | All regions |
-| gpt-4o-mini-realtime-preview | 2024-12-17 | 2/23 regions |
-| gpt-5-chat | 2025-08-07, 2025-10-03 | 2/23 regions |
+| gpt-4o-mini-realtime-preview | 2024-12-17 | eastus2, swedencentral |
+| gpt-5-chat | 2025-08-07, 2025-10-03 | eastus2, swedencentral |
 | gpt-5-mini | 2025-08-07 | All regions |
 | gpt-5-nano | 2025-08-07 | 22/23 regions |
 | gpt-5.1-chat | 2025-11-13 | 8/23 regions |
 | gpt-5.1-codex-mini | 2025-11-13 | 8/23 regions |
-| gpt-5.2-chat | 2025-12-11 | 2/23 regions |
+| gpt-5.2-chat | 2025-12-11 | eastus2, swedencentral |
 | o1 | 2024-12-17 | All regions |
-| o3-deep-research | 2025-06-26 | 2/23 regions |
+| o3-deep-research | 2025-06-26 | norwayeast, westus |
 | o3-mini | 2025-01-31 | All regions |
 | o4-mini | 2025-04-16 | All regions |
 
@@ -369,12 +369,12 @@ All models currently available on Microsoft Foundry that support the [Responses 
 
 | Model | Version(s) | Availability |
 |---|---|---|
-| claude-haiku-4-5 | 20251001 | 2/23 regions |
-| claude-opus-4-1 | 20250805 | 2/23 regions |
-| claude-opus-4-5 | 20251101 | 2/23 regions |
-| claude-opus-4-6 | 1 | 2/23 regions |
-| claude-sonnet-4-5 | 20250929 | 2/23 regions |
-| claude-sonnet-4-6 | 1 | 2/23 regions |
+| claude-haiku-4-5 | 20251001 | eastus2, swedencentral |
+| claude-opus-4-1 | 20250805 | eastus2, swedencentral |
+| claude-opus-4-5 | 20251101 | eastus2, swedencentral |
+| claude-opus-4-6 | 1 | eastus2, swedencentral |
+| claude-sonnet-4-5 | 20250929 | eastus2, swedencentral |
+| claude-sonnet-4-6 | 1 | eastus2, swedencentral |
 
 ### DeepSeek
 
@@ -419,7 +419,7 @@ All models currently available on Microsoft Foundry that support the [Responses 
   - `gpt-5-nano` — All regions except `canadacentral`
 - **20/23 regions** — `gpt-4-32k` is not available in `japaneast`, `southeastasia`, `westeurope`
 - **8/23 regions** — `gpt-5.1-chat` and `gpt-5.1-codex-mini` are available in `australiaeast`, `canadaeast`, `eastus2`, `japaneast`, `koreacentral`, `swedencentral`, `switzerlandnorth`, `uksouth`
-- **2/23 regions** — All Anthropic models, `codex-mini`, `gpt-4o-mini-realtime-preview`, `gpt-5-chat`, `gpt-5.2-chat` are available in `eastus2`, `swedencentral`. Exception: `o3-deep-research` is available in `norwayeast`, `westus`
+- **2 regions** — Regions are listed directly in the table
 
 > Run `python scripts/list_models_with_responses_api_support.py` for the latest data from your own subscription.
 
