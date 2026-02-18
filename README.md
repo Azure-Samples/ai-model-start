@@ -400,6 +400,9 @@ python list_models_with_responses_api_support.py --locations
 # List only non-OpenAI models (DeepSeek, Meta, xAI, etc.)
 python list_models_with_responses_api_support.py --non-openai
 
+# Show active model deployments across all Foundry accounts
+python list_models_with_responses_api_support.py --deployments
+
 # Combine flags
 python list_models_with_responses_api_support.py --non-openai --locations
 ```

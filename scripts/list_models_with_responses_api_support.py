@@ -13,6 +13,7 @@ Usage:
     python list_models_with_responses_api_support.py                          # all models
     python list_models_with_responses_api_support.py --non-openai             # non-OpenAI only
     python list_models_with_responses_api_support.py --locations              # per-region breakdown
+    python list_models_with_responses_api_support.py --deployments            # show active deployments
     python list_models_with_responses_api_support.py --subscription <sub-id>  # explicit subscription
 """
 
@@ -67,7 +68,7 @@ def get_subscription_id():
         return None
 
 
-def list_responses_models(subscription_id=None, show_locations=False, non_openai=False):
+def list_responses_models(subscription_id=None, show_locations=False, non_openai=False, show_deployments=False):
     credential = DefaultAzureCredential()
 
     if not subscription_id:
@@ -76,6 +77,10 @@ def list_responses_models(subscription_id=None, show_locations=False, non_openai
             print("Error: could not resolve a subscription. "
                   "Pass --subscription or sign in with 'az login'.")
             sys.exit(1)
+
+    if show_deployments:
+        list_active_deployments(credential, subscription_id)
+        return
 
     if non_openai:
         label = "non-OpenAI models with Responses API support"
@@ -174,6 +179,52 @@ def list_responses_models(subscription_id=None, show_locations=False, non_openai
     print(f"\nTotal: {len(models)} model(s) across {len(LOCATIONS)} locations")
 
 
+def list_active_deployments(credential, subscription_id):
+    """List active model deployments across all Foundry accounts in the subscription."""
+    client = CognitiveServicesManagementClient(credential, subscription_id)
+
+    print(f"Subscription: {subscription_id}\n")
+    print("Scanning for active model deployments...\n")
+
+    deployments = []
+    for account in client.accounts.list():
+        if account.kind not in ("AIServices", "OpenAI"):
+            continue
+        rg = account.id.split("/")[4]
+        for d in client.deployments.list(rg, account.name):
+            m = d.properties.model
+            caps = d.properties.capabilities or {}
+            has_responses = (
+                caps.get("responses") == "true"
+                or (m.format != "OpenAI" and caps.get("agentsV2") == "true")
+            )
+            deployments.append({
+                "account": account.name,
+                "rg": rg,
+                "location": account.location,
+                "deployment": d.name,
+                "format": m.format or "",
+                "model": m.name or "",
+                "version": m.version or "",
+                "sku": f"{d.sku.name}/{d.sku.capacity}",
+                "responses": has_responses,
+            })
+
+    if not deployments:
+        print("No model deployments found.")
+        return
+
+    print(f"  {'Deployment':<25} {'Model':<25} {'Format':<12} {'SKU':<20} {'Responses':<10} {'Account':<30} {'Location'}")
+    print(f"  {'-'*25} {'-'*25} {'-'*12} {'-'*20} {'-'*10} {'-'*30} {'-'*15}")
+
+    for d in sorted(deployments, key=lambda x: (x["account"], x["deployment"])):
+        resp = "Yes" if d["responses"] else "No"
+        print(f"  {d['deployment']:<25} {d['model']:<25} {d['format']:<12} {d['sku']:<20} {resp:<10} {d['account']:<30} {d['location']}")
+
+    resp_count = sum(1 for d in deployments if d["responses"])
+    print(f"\nTotal: {len(deployments)} deployment(s), {resp_count} with Responses API support")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="List models that support the Responses API via the ARM control plane."
@@ -193,8 +244,13 @@ def main():
         dest="non_openai",
         help="List only non-OpenAI models (DeepSeek, Meta, xAI, etc.) with Responses API support",
     )
+    parser.add_argument(
+        "--deployments", "-d",
+        action="store_true",
+        help="List active model deployments across all Foundry accounts in your subscription",
+    )
     args = parser.parse_args()
-    list_responses_models(args.subscription, args.locations, args.non_openai)
+    list_responses_models(args.subscription, args.locations, args.non_openai, args.deployments)
 
 
 if __name__ == "__main__":
