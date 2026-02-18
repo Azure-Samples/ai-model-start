@@ -3,18 +3,17 @@
 List models that support the Responses API in your Azure subscription.
 
 Queries the ARM control plane (Microsoft.CognitiveServices) across all available
-locations and shows which models have the "responses" capability.
+locations and shows which models support the Responses API.
 
-Note: The ARM API only tags OpenAI-format models with the "responses" capability.
-Non-OpenAI models (DeepSeek, Meta, xAI, etc.) that support chat completion also
-work with the Responses API at runtime, but are not tagged in the control plane.
-Use --non-openai to list these models.
+OpenAI-format models are identified by the "responses" capability, while
+non-OpenAI models (DeepSeek, Meta, xAI, etc.) are identified by "agentsV2".
+By default, both are shown together.
 
 Usage:
-    python list_models.py                          # OpenAI models with responses
-    python list_models.py --non-openai             # non-OpenAI chat models
-    python list_models.py --locations              # show per-region breakdown
-    python list_models.py --subscription <sub-id>  # explicit subscription
+    python list_models_with_responses_api_support.py                          # all models
+    python list_models_with_responses_api_support.py --non-openai             # non-OpenAI only
+    python list_models_with_responses_api_support.py --locations              # per-region breakdown
+    python list_models_with_responses_api_support.py --subscription <sub-id>  # explicit subscription
 """
 
 import argparse
@@ -79,9 +78,9 @@ def list_responses_models(subscription_id=None, show_locations=False, non_openai
             sys.exit(1)
 
     if non_openai:
-        label = "non-OpenAI chat-capable models (work with Responses API)"
+        label = "non-OpenAI models with Responses API support"
     else:
-        label = "OpenAI models with Responses API support"
+        label = "models with Responses API support"
 
     print(f"Subscription: {subscription_id}\n")
     print(f"Scanning {len(LOCATIONS)} locations for {label}...\n")
@@ -103,16 +102,18 @@ def list_responses_models(subscription_id=None, show_locations=False, non_openai
                 fmt = m.format or ""
 
                 if non_openai:
-                    # Show non-OpenAI models with chatCompletion support.
-                    # These work with the Responses API even though the ARM
-                    # capabilities object doesn't tag them with "responses".
+                    # Non-OpenAI models with agentsV2 support.
                     if fmt == "OpenAI":
                         continue
-                    if caps.get("chatCompletion") != "true":
+                    if caps.get("agentsV2") != "true":
                         continue
                 else:
-                    # Default: OpenAI models explicitly tagged with responses.
-                    if caps.get("responses") != "true":
+                    # Default: all models with Responses API support.
+                    # OpenAI models are tagged with "responses",
+                    # non-OpenAI models are tagged with "agentsV2".
+                    is_openai_responses = fmt == "OpenAI" and caps.get("responses") == "true"
+                    is_non_openai_responses = fmt != "OpenAI" and caps.get("agentsV2") == "true"
+                    if not (is_openai_responses or is_non_openai_responses):
                         continue
 
                 key = (fmt, m.name or "")
@@ -190,7 +191,7 @@ def main():
         "--non-openai",
         action="store_true",
         dest="non_openai",
-        help="List non-OpenAI models (DeepSeek, Meta, xAI, etc.) that support chat completion and work with the Responses API",
+        help="List only non-OpenAI models (DeepSeek, Meta, xAI, etc.) with Responses API support",
     )
     args = parser.parse_args()
     list_responses_models(args.subscription, args.locations, args.non_openai)

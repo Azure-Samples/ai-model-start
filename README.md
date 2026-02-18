@@ -177,7 +177,7 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai/v1` and
 │   ├── main.parameters.json   # Deployment parameters
 │   └── foundry.bicep          # Microsoft Foundry account, project, and model deployment
 ├── scripts/
-│   ├── list_models.py         # Utility: list models supporting the Responses API
+│   ├── list_models_with_responses_api_support.py  # Utility: list models supporting the Responses API
 │   └── requirements.txt       # Dependencies for scripts (control plane)
 ├── src/
 │   ├── python/
@@ -291,26 +291,26 @@ azd up
 
 ## How Do I Find Which Foundry Models Support Responses and Where?
 
-The `scripts/list_models.py` utility queries the ARM control plane to discover which models support the Responses API in your subscription, along with their available regions.
+The `scripts/list_models_with_responses_api_support.py` utility queries the ARM control plane to discover which models support the Responses API in your subscription, along with their available regions.
 
 ```bash
 cd scripts
 pip install -r requirements.txt
 
-# List OpenAI models with explicit Responses API support
-python list_models.py
+# List all models with Responses API support (OpenAI + non-OpenAI)
+python list_models_with_responses_api_support.py
 
 # Show per-region breakdown for models not available everywhere
-python list_models.py --locations
+python list_models_with_responses_api_support.py --locations
 
-# List non-OpenAI models (DeepSeek, Meta, xAI, etc.)
-python list_models.py --non-openai
+# List only non-OpenAI models (DeepSeek, Meta, xAI, etc.)
+python list_models_with_responses_api_support.py --non-openai
 
 # Combine flags
-python list_models.py --non-openai --locations
+python list_models_with_responses_api_support.py --non-openai --locations
 ```
 
-> **Note:** The ARM control plane only tags OpenAI-format models with the `responses` capability. Non-OpenAI models (DeepSeek, Meta, xAI, Mistral, etc.) that support chat completion also work with the Responses API at runtime — use `--non-openai` to list those.
+> **Note:** The ARM control plane tags OpenAI-format models with `capabilities.responses`. For non-OpenAI models, `capabilities.agentsV2` is used as a proxy — models with this capability support the Responses API at runtime. The default run combines both into a single unified list.
 
 ## Troubleshooting
 
