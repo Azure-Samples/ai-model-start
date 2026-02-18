@@ -176,6 +176,9 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai/v1` and
 │   ├── main.bicep             # Main deployment template (subscription-scoped)
 │   ├── main.parameters.json   # Deployment parameters
 │   └── foundry.bicep          # Microsoft Foundry account, project, and model deployment
+├── scripts/
+│   ├── list_models.py         # Utility: list models supporting the Responses API
+│   └── requirements.txt       # Dependencies for scripts (control plane)
 ├── src/
 │   ├── python/
 │   │   ├── responses_example.py   # Python: openai + azure-identity
@@ -285,6 +288,29 @@ azd down --purge
 azd env set AZURE_LOCATION eastus2
 azd up
 ```
+
+## How Do I Find Which Foundry Models Support Responses and Where?
+
+The `scripts/list_models.py` utility queries the ARM control plane to discover which models support the Responses API in your subscription, along with their available regions.
+
+```bash
+cd scripts
+pip install -r requirements.txt
+
+# List OpenAI models with explicit Responses API support
+python list_models.py
+
+# Show per-region breakdown for models not available everywhere
+python list_models.py --locations
+
+# List non-OpenAI models (DeepSeek, Meta, xAI, etc.)
+python list_models.py --non-openai
+
+# Combine flags
+python list_models.py --non-openai --locations
+```
+
+> **Note:** The ARM control plane only tags OpenAI-format models with the `responses` capability. Non-OpenAI models (DeepSeek, Meta, xAI, Mistral, etc.) that support chat completion also work with the Responses API at runtime — use `--non-openai` to list those.
 
 ## Troubleshooting
 
