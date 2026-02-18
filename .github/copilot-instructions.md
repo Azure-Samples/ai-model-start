@@ -104,11 +104,15 @@ client := openai.NewClient(
 ```
 
 ### Authentication
-Always **keyless** via `DefaultAzureCredential` (EntraID). Never use API keys or `AzureKeyCredential`. Users need the `Cognitive Services OpenAI User` role on the Microsoft Foundry account. Token audience is always `https://ai.azure.com/.default`.
+Prefer **keyless** via `DefaultAzureCredential` (EntraID) for production. Users need the `Cognitive Services OpenAI User` role on the Microsoft Foundry account. Token audience is always `https://ai.azure.com/.default`.
+
+API key authentication is also available for quick dev/test. API key examples use the **account endpoint** (`AZURE_AI_FOUNDRY_ENDPOINT`) with `/openai/v1` — no `api-version` query parameter needed. EntraID examples use the **project endpoint** (`AZURE_AI_PROJECT_ENDPOINT`) with `/openai/v1` and `api-version=2025-11-15-preview`.
 
 ### Environment variables
-One required at runtime — set from `azd env get-values` after provisioning:
-- `AZURE_AI_PROJECT_ENDPOINT` — the project endpoint (not the account endpoint); used as `base_url` with `/openai/v1` suffix
+Set from `azd env get-values` after provisioning:
+- `AZURE_AI_PROJECT_ENDPOINT` — the project endpoint; used as `base_url` with `/openai/v1` suffix for EntraID auth
+- `AZURE_AI_FOUNDRY_ENDPOINT` — the account endpoint; used as `base_url` with `/openai/v1` suffix for API key auth
+- `AZURE_AI_API_KEY` — API key for the Foundry account (only for API key auth, obtained via `az cognitiveservices account keys list`)
 
 ### Bicep conventions
 - Target scope is `subscription` in `main.bicep`; resource-group-scoped resources go in `foundry.bicep` module.
@@ -131,12 +135,19 @@ azd up
 # Set environment variables
 $env:AZURE_AI_PROJECT_ENDPOINT = azd env get-value 'AZURE_AI_PROJECT_ENDPOINT'
 
-# Run any example
+# Run any example (EntraID - recommended)
 cd src/python   && pip install -r requirements.txt && python responses_example.py
 cd src/typescript && npm install && npx tsx responses_example.ts
 cd src/csharp   && dotnet run
 cd src/java     && mvn -q compile exec:java
 cd src/go       && go run .
+
+# Run API key examples (quick dev/test)
+cd src/python   && python responses_example_apikey.py
+cd src/typescript && npx tsx responses_example_apikey.ts
+cd src/csharp   && dotnet run -- --apikey
+cd src/java     && mvn -q compile exec:java -Dexec.mainClass=ResponsesExampleApiKey
+cd src/go/apikey && go run .
 
 # Tear down all resources
 azd down --purge

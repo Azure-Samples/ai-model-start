@@ -63,7 +63,14 @@ That's it! You now have a Microsoft Foundry account with a model deployed and re
 
 ## Next Steps
 
-### Set up your environment
+### Option A: Keyless Authentication (Recommended)
+
+Use EntraID keyless authentication — the secure, production-ready approach. No secrets to manage.
+
+<details>
+<summary>Click to expand keyless setup and code examples</summary>
+
+#### Set up your environment
 
 ```powershell
 # 1. Set the project endpoint environment variable
@@ -75,7 +82,7 @@ $resourceId = "/subscriptions/$(az account show --query id -o tsv)/resourceGroup
 az role assignment create --role "Cognitive Services OpenAI User" --assignee $userId --scope $resourceId
 ```
 
-### Run an example
+#### Run an example
 
 Each example calls both an **OpenAI model** (gpt-4.1-mini) and a **non-OpenAI model** (DeepSeek-R1-0528) using the Responses API.
 
@@ -111,7 +118,7 @@ cd src/go
 go run .
 ```
 
-### The pattern (every language)
+#### The pattern (every language)
 
 All five examples follow the same pattern:
 
@@ -120,7 +127,7 @@ All five examples follow the same pattern:
 3. **Pass `api-version`** as a query parameter (`2025-11-15-preview`)
 4. **Call the Responses API** — works with any deployed model
 
-### Python code sample
+#### Python code sample
 
 ```python
 import os
@@ -146,6 +153,86 @@ response = client.responses.create(
 print(response.output_text)
 ```
 
+</details>
+
+### Option B: API Key Authentication (Quick Start)
+
+For quick testing and development — get started in seconds with an API key.
+
+> **Note:** API keys are less secure than keyless auth. Use Option A for production workloads.
+
+<details>
+<summary>Click to expand API key setup and code examples</summary>
+
+#### Get your API key
+
+```powershell
+# 1. Set the account endpoint
+$env:AZURE_AI_FOUNDRY_ENDPOINT = azd env get-value 'AZURE_AI_FOUNDRY_ENDPOINT'
+
+# 2. Get the API key from your Foundry account
+$env:AZURE_AI_API_KEY = az cognitiveservices account keys list `
+    --name $(azd env get-value 'AZURE_AI_FOUNDRY_NAME') `
+    --resource-group "rg-$(azd env get-value 'AZURE_ENV_NAME')" `
+    --query key1 -o tsv
+```
+
+#### Run an example
+
+**Python**
+```bash
+cd src/python
+pip install -r requirements.txt
+python responses_example_apikey.py
+```
+
+**TypeScript**
+```bash
+cd src/typescript
+npm install
+npx tsx responses_example_apikey.ts
+```
+
+**C#**
+```bash
+cd src/csharp
+dotnet run -- --apikey
+```
+
+**Java** (requires Maven)
+```bash
+cd src/java
+mvn -q compile exec:java -Dexec.mainClass=ResponsesExampleApiKey
+```
+
+**Go**
+```bash
+cd src/go/apikey
+go run .
+```
+
+#### Python code sample (API key)
+
+```python
+import os
+from openai import OpenAI
+
+endpoint = os.environ["AZURE_AI_FOUNDRY_ENDPOINT"]
+client = OpenAI(
+    base_url=endpoint.rstrip("/") + "/openai/v1",
+    api_key=os.environ["AZURE_AI_API_KEY"],
+)
+
+response = client.responses.create(
+    model="gpt-4.1-mini",
+    input="Explain quantum computing in simple terms",
+    max_output_tokens=1000,
+)
+print(response.output_text)
+```
+
+</details>
+
 **Why the standard OpenAI SDK?**
 
 The Foundry project endpoint is OpenAI-compatible. By appending `/openai/v1` and passing the `api-version` as a query parameter, you can use the standard `openai` library in any language — no `azure-ai-projects`, `AzureOpenAI`, or `Azure.AI.OpenAI` wrapper needed. This works for all model providers (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more).
@@ -154,7 +241,7 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai/v1` and
 
 - **Core Infrastructure**: Microsoft Foundry account + project with a model deployment
 - **Optimal Configuration**: GlobalStandard SKU, flexible region and model selection
-- **Secure Authentication**: EntraID (keyless) via `DefaultAzureCredential`
+- **Secure Authentication**: EntraID (keyless) via `DefaultAzureCredential` + API key option for quick dev/test
 - **Multi-language examples**: Python, TypeScript, C#, Java, and Go — all using their standard OpenAI SDK
 - **Complete Documentation**: Setup guide with troubleshooting tips
 
@@ -165,7 +252,7 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai/v1` and
 - **Microsoft Foundry project** — Full project workspace for your development team
 - **Standard OpenAI SDKs** — Use each language's `openai` library directly, no Azure-specific wrappers
 - **Responses API support** — Modern API, cleaner than Chat Completions
-- **Keyless authentication** — Secure EntraID auth, no API keys to manage
+- **Keyless authentication** — Secure EntraID auth, no API keys to manage (API key option also available for quick dev/test)
 - **Unique resource naming** — No conflicts with existing resources
 
 ## Template Structure
@@ -181,21 +268,28 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai/v1` and
 │   └── requirements.txt       # Dependencies for scripts (control plane)
 ├── src/
 │   ├── python/
-│   │   ├── responses_example.py   # Python: openai + azure-identity
+│   │   ├── responses_example.py         # Python: EntraID auth (recommended)
+│   │   ├── responses_example_apikey.py   # Python: API key auth (quick start)
 │   │   └── requirements.txt
 │   ├── typescript/
-│   │   ├── responses_example.ts   # TypeScript: openai + @azure/identity
+│   │   ├── responses_example.ts         # TypeScript: EntraID auth (recommended)
+│   │   ├── responses_example_apikey.ts   # TypeScript: API key auth (quick start)
 │   │   ├── package.json
 │   │   └── tsconfig.json
 │   ├── csharp/
-│   │   ├── Program.cs             # C#: OpenAI + Azure.Identity
+│   │   ├── Program.cs                   # C#: EntraID auth (recommended)
+│   │   ├── ProgramApiKey.cs             # C#: API key auth (quick start, run with --apikey)
 │   │   └── FoundryModelsExample.csproj
 │   ├── java/
-│   │   ├── src/main/java/ResponsesExample.java  # Java: openai-java + azure-identity
+│   │   ├── src/main/java/ResponsesExample.java          # Java: EntraID auth (recommended)
+│   │   ├── src/main/java/ResponsesExampleApiKey.java    # Java: API key auth (quick start)
 │   │   └── pom.xml
 │   └── go/
-│       ├── main.go                # Go: openai-go + azidentity
-│       └── go.mod
+│       ├── main.go                      # Go: EntraID auth (recommended)
+│       ├── go.mod
+│       └── apikey/
+│           ├── main.go                  # Go: API key auth (quick start)
+│           └── go.mod
 └── README.md
 ```
 

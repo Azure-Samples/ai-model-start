@@ -8,6 +8,12 @@ using Azure.Identity;
 using OpenAI;
 using OpenAI.Responses;
 
+// Route to API key example if --apikey flag is passed
+if (args.Contains("--apikey"))
+{
+    return await ApiKeyExample.RunAsync();
+}
+
 var endpoint = Environment.GetEnvironmentVariable("AZURE_AI_PROJECT_ENDPOINT");
 if (string.IsNullOrEmpty(endpoint))
 {
