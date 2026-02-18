@@ -2,7 +2,7 @@
 
 The fastest way to get started with building apps using **any AI model**.
 
-Call **Foundry models** sold directly by Azure — GPT, DeepSeek, Grok, Llama, and more — using **stable OpenAI SDKs** with a **GA OpenAI Responses API**. Production grade, enterprise friendly and secure with **EntraID keyless authentication** — no API keys, and zero secrets to manage.
+Call **any Foundry models** — GPT, DeepSeek, Grok, Llama, and more — using **stable OpenAI SDKs** and the **OpenAI Responses API**. Production grade, enterprise friendly and secure with **EntraID keyless authentication** — no API keys, and zero secrets to manage.
 
 Includes working examples in **Python, TypeScript, C#, Java, and Go**.
 
@@ -12,7 +12,7 @@ block-beta
     sdkTitle["OpenAI SDKs (Stable)"]:5
     py["🐍 Python"] ts["📘 TypeScript"] cs["🟪 C#"] java["☕ Java"] go["🩵 Go"]
     space:5
-    space:1 arrow["⚡ OpenAI/v1 Responses API (GA)"]:3 space:1
+    space:1 arrow["⚡ OpenAI Responses API"]:3 space:1
     space:1 auth["🔐 EntraID Keyless Auth · Zero Secrets"]:3 space:1
     space:5
     foundryTitle["Microsoft Foundry Models"]:5
