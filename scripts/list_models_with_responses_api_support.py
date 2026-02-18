@@ -133,7 +133,13 @@ def list_responses_models(subscription_id=None, show_locations=False, non_openai
             pass
 
     if not models:
-        print(f"No {label} found.")
+        print(f"No {label} found.\n")
+        print("Possible causes:")
+        print("  1. Microsoft.CognitiveServices provider not registered in your subscription.")
+        print("     Run: az provider register --namespace Microsoft.CognitiveServices")
+        print("  2. Subscription not approved for Azure OpenAI. Apply at: https://aka.ms/oai/access")
+        print("  3. Outdated SDK. Run: pip install --upgrade azure-mgmt-cognitiveservices")
+        print("  4. Insufficient permissions. You need Reader access at the subscription level.")
         return
 
     # Display results
