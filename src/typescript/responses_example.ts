@@ -1,6 +1,6 @@
 /**
  * Microsoft Foundry Models - Responses API Example (Plain OpenAI SDK)
- * Uses the standard openai package with the project endpoint + /openai/v1 suffix.
+ * Uses the standard openai package with the project endpoint + /openai suffix.
  * No dependency on @azure/openai.
  */
 
@@ -26,7 +26,7 @@ async function main() {
     process.exit(1);
   }
 
-  const baseURL = endpoint.replace(/\/+$/, "") + "/openai/v1";
+  const baseURL = endpoint.replace(/\/+$/, "") + "/openai";
   const token = await getToken();
 
   const client = new OpenAI({

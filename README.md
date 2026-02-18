@@ -123,7 +123,7 @@ go run .
 All five examples follow the same pattern:
 
 1. **Get an EntraID token** via `DefaultAzureCredential` (scoped to `https://ai.azure.com/.default`)
-2. **Create a standard OpenAI client** with `base_url` = project endpoint + `/openai/v1`
+2. **Create a standard OpenAI client** with `base_url` = project endpoint + `/openai`
 3. **Pass `api-version`** as a query parameter (`2025-11-15-preview`)
 4. **Call the Responses API** — works with any deployed model
 
@@ -139,7 +139,7 @@ token = credential.get_token("https://ai.azure.com/.default").token
 
 endpoint = os.environ["AZURE_AI_PROJECT_ENDPOINT"]
 client = OpenAI(
-    base_url=endpoint.rstrip("/") + "/openai/v1",
+    base_url=endpoint.rstrip("/") + "/openai",
     api_key=token,
     default_query={"api-version": "2025-11-15-preview"},
 )
@@ -235,7 +235,7 @@ print(response.output_text)
 
 **Why the standard OpenAI SDK?**
 
-The Foundry project endpoint is OpenAI-compatible. By appending `/openai/v1` and passing the `api-version` as a query parameter, you can use the standard `openai` library in any language — no `azure-ai-projects`, `AzureOpenAI`, or `Azure.AI.OpenAI` wrapper needed. This works for all model providers (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more).
+The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and passing the `api-version` as a query parameter, you can use the standard `openai` library in any language — no `azure-ai-projects`, `AzureOpenAI`, or `Azure.AI.OpenAI` wrapper needed. This works for all model providers (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more).
 
 ## What This Template Includes
 
@@ -357,7 +357,7 @@ After `azd up`, available via `azd env get-values`:
 | `AZURE_AI_FOUNDRY_NAME` | Microsoft Foundry account name |
 | `AZURE_AI_FOUNDRY_ENDPOINT` | Account endpoint URL |
 | `AZURE_AI_PROJECT_NAME` | Foundry project name |
-| `AZURE_AI_PROJECT_ENDPOINT` | Project endpoint URL (use as `base_url` with `/openai/v1` suffix) |
+| `AZURE_AI_PROJECT_ENDPOINT` | Project endpoint URL (use as `base_url` with `/openai` suffix) |
 | `AZURE_MODEL_DEPLOYMENT_NAME` | Model deployment name |
 
 ## Common Commands

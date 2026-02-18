@@ -1,5 +1,5 @@
 // Microsoft Foundry Models - Responses API Example (Plain OpenAI SDK)
-// Uses the standard OpenAI NuGet package with the project endpoint + /openai/v1 suffix.
+// Uses the standard OpenAI NuGet package with the project endpoint + /openai suffix.
 // No dependency on Azure.AI.OpenAI.
 
 using System.ClientModel;
@@ -31,7 +31,7 @@ var token = await credential.GetTokenAsync(
 
 // Standard OpenAI client — no AzureOpenAI wrapper
 // Add api-version query parameter via a custom pipeline policy
-var baseUrl = endpoint.TrimEnd('/') + "/openai/v1";
+var baseUrl = endpoint.TrimEnd('/') + "/openai";
 var options = new OpenAIClientOptions { Endpoint = new Uri(baseUrl) };
 options.AddPolicy(new ApiVersionPolicy("2025-11-15-preview"), PipelinePosition.BeforeTransport);
 var client = new OpenAIClient(new ApiKeyCredential(token.Token), options);

@@ -1,5 +1,5 @@
 // Microsoft Foundry Models - Responses API Example (Plain OpenAI SDK)
-// Uses the standard openai-go package with the project endpoint + /openai/v1 suffix.
+// Uses the standard openai-go package with the project endpoint + /openai suffix.
 // No dependency on Azure AI SDKs for model invocation.
 package main
 
@@ -42,7 +42,7 @@ func main() {
 	}
 
 	// Standard OpenAI client — no Azure wrapper
-	baseURL := strings.TrimRight(endpoint, "/") + "/openai/v1"
+	baseURL := strings.TrimRight(endpoint, "/") + "/openai"
 	client := openai.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey(token.Token),

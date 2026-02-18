@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Microsoft Foundry Models - Responses API Example (Plain OpenAI SDK)
-Uses the standard openai.OpenAI client with the project endpoint + /openai/v1 suffix.
+Uses the standard openai.OpenAI client with the project endpoint + /openai suffix.
 No dependency on azure.ai.projects.
 """
 
@@ -28,8 +28,8 @@ def main():
         print("Error: AZURE_AI_PROJECT_ENDPOINT must be set.")
         sys.exit(1)
 
-    # Build the base URL: project endpoint + /openai/v1
-    base_url = endpoint.rstrip("/") + "/openai/v1"
+    # Build the base URL: project endpoint + /openai
+    base_url = endpoint.rstrip("/") + "/openai"
     token = get_token()
 
     # Standard OpenAI client — no AzureOpenAI, no AIProjectClient

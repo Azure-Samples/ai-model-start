@@ -15,7 +15,7 @@ This is an **Azure Developer CLI (azd) template** that deploys a Microsoft Found
 Every example follows the same three steps:
 
 1. **Get an EntraID token** via `DefaultAzureCredential` scoped to `https://ai.azure.com/.default`
-2. **Create a standard OpenAI client** with `base_url` = project endpoint + `/openai/v1`, passing the token as `api_key`
+2. **Create a standard OpenAI client** with `base_url` = project endpoint + `/openai`, passing the token as `api_key`
 3. **Pass `api-version=2025-11-15-preview`** as a query parameter (mechanism varies by language)
 
 Do **not** use `azure-ai-projects` (`AIProjectClient`), `openai.AzureOpenAI`, `Azure.AI.OpenAI`, or any Azure-specific OpenAI wrapper. Use each language's standard `openai` library only.
@@ -32,7 +32,7 @@ token = credential.get_token("https://ai.azure.com/.default").token
 
 endpoint = os.environ["AZURE_AI_PROJECT_ENDPOINT"]
 client = OpenAI(
-    base_url=endpoint.rstrip("/") + "/openai/v1",
+    base_url=endpoint.rstrip("/") + "/openai",
     api_key=token,
     default_query={"api-version": "2025-11-15-preview"},
 )
@@ -49,7 +49,7 @@ const credential = new DefaultAzureCredential();
 const token = await credential.getToken("https://ai.azure.com/.default");
 
 const client = new OpenAI({
-  baseURL: process.env.AZURE_AI_PROJECT_ENDPOINT!.replace(/\/+$/, "") + "/openai/v1",
+  baseURL: process.env.AZURE_AI_PROJECT_ENDPOINT!.replace(/\/+$/, "") + "/openai",
   apiKey: token.token,
   defaultQuery: { "api-version": "2025-11-15-preview" },
 });
@@ -69,7 +69,7 @@ options.AddPolicy(new ApiVersionPolicy("2025-11-15-preview"), PipelinePosition.B
 
 var client = new OpenAIClient(
     new ApiKeyCredential(token.Token),
-    options with { Endpoint = new Uri(endpoint.TrimEnd('/') + "/openai/v1") });
+    options with { Endpoint = new Uri(endpoint.TrimEnd('/') + "/openai") });
 var responsesClient = client.GetResponseClient();
 ```
 
@@ -80,7 +80,7 @@ DefaultAzureCredential credential = new DefaultAzureCredentialBuilder().build();
 AccessToken token = credential.getTokenSync(new TokenRequestContext().addScopes("https://ai.azure.com/.default"));
 
 OpenAIClient client = OpenAIOkHttpClient.builder()
-    .baseUrl(endpoint.replaceAll("/+$", "") + "/openai/v1")
+    .baseUrl(endpoint.replaceAll("/+$", "") + "/openai")
     .apiKey(token.getToken())
     .putQueryParam("api-version", "2025-11-15-preview")
     .build();
@@ -97,7 +97,7 @@ token, _ := credential.GetToken(context.Background(), policy.TokenRequestOptions
 })
 
 client := openai.NewClient(
-    option.WithBaseURL(strings.TrimRight(endpoint, "/") + "/openai/v1"),
+    option.WithBaseURL(strings.TrimRight(endpoint, "/") + "/openai"),
     option.WithAPIKey(token.Token),
     option.WithQueryAdd("api-version", "2025-11-15-preview"),
 )
@@ -106,11 +106,11 @@ client := openai.NewClient(
 ### Authentication
 Prefer **keyless** via `DefaultAzureCredential` (EntraID) for production. Users need the `Cognitive Services OpenAI User` role on the Microsoft Foundry account. Token audience is always `https://ai.azure.com/.default`.
 
-API key authentication is also available for quick dev/test. API key examples use the **account endpoint** (`AZURE_AI_FOUNDRY_ENDPOINT`) with `/openai/v1` — no `api-version` query parameter needed. EntraID examples use the **project endpoint** (`AZURE_AI_PROJECT_ENDPOINT`) with `/openai/v1` and `api-version=2025-11-15-preview`.
+API key authentication is also available for quick dev/test. API key examples use the **account endpoint** (`AZURE_AI_FOUNDRY_ENDPOINT`) with `/openai/v1` — no `api-version` query parameter needed. EntraID examples use the **project endpoint** (`AZURE_AI_PROJECT_ENDPOINT`) with `/openai` and `api-version=2025-11-15-preview`.
 
 ### Environment variables
 Set from `azd env get-values` after provisioning:
-- `AZURE_AI_PROJECT_ENDPOINT` — the project endpoint; used as `base_url` with `/openai/v1` suffix for EntraID auth
+- `AZURE_AI_PROJECT_ENDPOINT` — the project endpoint; used as `base_url` with `/openai` suffix for EntraID auth
 - `AZURE_AI_FOUNDRY_ENDPOINT` — the account endpoint; used as `base_url` with `/openai/v1` suffix for API key auth
 - `AZURE_AI_API_KEY` — API key for the Foundry account (only for API key auth, obtained via `az cognitiveservices account keys list`)
 
@@ -157,7 +157,7 @@ azd down --purge
 
 ### Any language
 - Place new scripts in `src/<language>/`.
-- Follow the universal pattern: get EntraID token (audience `https://ai.azure.com/.default`), create standard OpenAI client with `base_url` = project endpoint + `/openai/v1`, call the Responses API.
+- Follow the universal pattern: get EntraID token (audience `https://ai.azure.com/.default`), create standard OpenAI client with `base_url` = project endpoint + `/openai`, call the Responses API.
 - Use the `responses` API, not `chat.completions`.
 - Do not add Azure-specific OpenAI wrappers (`azure-ai-projects`, `AzureOpenAI`, `Azure.AI.OpenAI`, etc.).
 - Keep scripts self-contained (no shared utility modules exist).
