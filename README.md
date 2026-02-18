@@ -291,7 +291,7 @@ azd up
 
 ## How Do I Find Which Foundry Models Support Responses and Where?
 
-The `scripts/list_models_with_responses_api_support.py` utility queries the ARM control plane to discover which models support the Responses API in your subscription, along with their available regions.
+The `scripts/list_models_with_responses_api_support.py` utility queries the ARM control plane to discover which models support the Responses API in your subscription, along with their available regions. See the [full list of supported models](#foundry-models-with-responses-api-support) at the bottom of this page.
 
 ```bash
 cd scripts
