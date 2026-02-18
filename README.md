@@ -416,7 +416,13 @@ python list_models_with_responses_api_support.py --non-openai --locations
 
 **429 Rate limited** — Increase `AZURE_DEPLOYMENT_SKU_CAPACITY` or try a different model with more available capacity.
 
-**"api-version is required"** — Pass `api-version` as a query parameter when creating the OpenAI client. Each language example shows how to do this.
+**"api-version query parameter is not allowed when using /v1 path"** — The `/v1` path rejects `api-version`. Use the correct path for your auth method:
+- **EntraID auth**: `project_endpoint + /openai` with `api-version=2025-11-15-preview` as a query parameter
+- **API key auth**: `account_endpoint + /openai/v1` with **no** `api-version`
+
+**"api-version is required"** / **"Missing required query string parameter 'api-version'"** — You're using the `/openai` path without passing `api-version`. Add `api-version=2025-11-15-preview` as a query parameter. Each language example shows how to do this.
+
+**"UnsupportedApiVersion"** — You're using a path that requires `api-version` but didn't set it explicitly, so the SDK is sending its default (which isn't supported). Set `api-version=2025-11-15-preview` as a query parameter, or switch to the `/openai/v1` path with API key auth (which doesn't need `api-version`).
 
 Need debug info? Run `azd up --debug` for detailed logs.
 
