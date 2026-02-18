@@ -414,6 +414,13 @@ All models currently available on Microsoft Foundry that support the [Responses 
 | grok-4-fast-non-reasoning | 1 | 22/23 regions |
 | grok-4-fast-reasoning | 1 | 22/23 regions |
 
+**Region availability notes:**
+- **22/23 regions** — All regions except `southeastasia`, with the following exceptions:
+  - `gpt-5-nano` — All regions except `canadacentral`
+- **20/23 regions** — `gpt-4-32k` is not available in `japaneast`, `southeastasia`, `westeurope`
+- **8/23 regions** — `gpt-5.1-chat` and `gpt-5.1-codex-mini` are available in `australiaeast`, `canadaeast`, `eastus2`, `japaneast`, `koreacentral`, `swedencentral`, `switzerlandnorth`, `uksouth`
+- **2/23 regions** — All Anthropic models, `codex-mini`, `gpt-4o-mini-realtime-preview`, `gpt-5-chat`, `gpt-5.2-chat` are available in `eastus2`, `swedencentral`. Exception: `o3-deep-research` is available in `norwayeast`, `westus`
+
 > Run `python scripts/list_models_with_responses_api_support.py` for the latest data from your own subscription.
 
 ---
