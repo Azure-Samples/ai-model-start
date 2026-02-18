@@ -346,7 +346,7 @@ All models currently available on Microsoft Foundry that support the [Responses 
 | Model | Version(s) | Availability |
 |---|---|---|
 | codex-mini | 2025-05-16 | eastus2, swedencentral |
-| gpt-4 | 0613 | 22/23 regions |
+| gpt-4 | 0613 | All except southeastasia |
 | gpt-4-32k | 0613 | 20/23 regions |
 | gpt-4.1 | 2025-04-14 | All regions |
 | gpt-4.1-mini | 2025-04-14 | All regions |
@@ -356,7 +356,7 @@ All models currently available on Microsoft Foundry that support the [Responses 
 | gpt-4o-mini-realtime-preview | 2024-12-17 | eastus2, swedencentral |
 | gpt-5-chat | 2025-08-07, 2025-10-03 | eastus2, swedencentral |
 | gpt-5-mini | 2025-08-07 | All regions |
-| gpt-5-nano | 2025-08-07 | 22/23 regions |
+| gpt-5-nano | 2025-08-07 | All except canadacentral |
 | gpt-5.1-chat | 2025-11-13 | 8/23 regions |
 | gpt-5.1-codex-mini | 2025-11-13 | 8/23 regions |
 | gpt-5.2-chat | 2025-12-11 | eastus2, swedencentral |
@@ -380,46 +380,43 @@ All models currently available on Microsoft Foundry that support the [Responses 
 
 | Model | Version(s) | Availability |
 |---|---|---|
-| DeepSeek-R1-0528 | 1 | 22/23 regions |
-| DeepSeek-V3-0324 | 1 | 22/23 regions |
-| DeepSeek-V3.1 | 1 | 22/23 regions |
-| DeepSeek-V3.2 | 1 | 22/23 regions |
-| DeepSeek-V3.2-Speciale | 1 | 22/23 regions |
+| DeepSeek-R1-0528 | 1 | All except southeastasia |
+| DeepSeek-V3-0324 | 1 | All except southeastasia |
+| DeepSeek-V3.1 | 1 | All except southeastasia |
+| DeepSeek-V3.2 | 1 | All except southeastasia |
+| DeepSeek-V3.2-Speciale | 1 | All except southeastasia |
 
 ### Meta
 
 | Model | Version(s) | Availability |
 |---|---|---|
-| Llama-3.3-70B-Instruct | 1, 2, 3, 4, 5 | 22/23 regions |
-| Llama-4-Maverick-17B-128E-Instruct-FP8 | 1 | 22/23 regions |
+| Llama-3.3-70B-Instruct | 1, 2, 3, 4, 5 | All except southeastasia |
+| Llama-4-Maverick-17B-128E-Instruct-FP8 | 1 | All except southeastasia |
 
 ### Microsoft
 
 | Model | Version(s) | Availability |
 |---|---|---|
-| MAI-DS-R1 | 1 | 22/23 regions |
+| MAI-DS-R1 | 1 | All except southeastasia |
 
 ### OpenAI-OSS
 
 | Model | Version(s) | Availability |
 |---|---|---|
-| gpt-oss-120b | 1 | 22/23 regions |
+| gpt-oss-120b | 1 | All except southeastasia |
 
 ### xAI
 
 | Model | Version(s) | Availability |
 |---|---|---|
-| grok-3 | 1 | 22/23 regions |
-| grok-3-mini | 1 | 22/23 regions |
-| grok-4-fast-non-reasoning | 1 | 22/23 regions |
-| grok-4-fast-reasoning | 1 | 22/23 regions |
+| grok-3 | 1 | All except southeastasia |
+| grok-3-mini | 1 | All except southeastasia |
+| grok-4-fast-non-reasoning | 1 | All except southeastasia |
+| grok-4-fast-reasoning | 1 | All except southeastasia |
 
 **Region availability notes:**
-- **22/23 regions** — All regions except `southeastasia`, with the following exceptions:
-  - `gpt-5-nano` — All regions except `canadacentral`
 - **20/23 regions** — `gpt-4-32k` is not available in `japaneast`, `southeastasia`, `westeurope`
 - **8/23 regions** — `gpt-5.1-chat` and `gpt-5.1-codex-mini` are available in `australiaeast`, `canadaeast`, `eastus2`, `japaneast`, `koreacentral`, `swedencentral`, `switzerlandnorth`, `uksouth`
-- **2 regions** — Regions are listed directly in the table
 
 > Run `python scripts/list_models_with_responses_api_support.py` for the latest data from your own subscription.
 
