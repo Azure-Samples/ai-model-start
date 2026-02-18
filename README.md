@@ -337,6 +337,85 @@ Need debug info? Run `azd up --debug` for detailed logs.
 - **Secure by default** — Keyless authentication with Azure Identity
 - **Easy cleanup** — Remove everything with `azd down --purge`
 
+## Foundry Models with Responses API Support
+
+All models currently available on Microsoft Foundry that support the [Responses API](https://platform.openai.com/docs/api-reference/responses), queried via the ARM control plane. Last updated: **February 2026**.
+
+### OpenAI
+
+| Model | Version(s) | Availability |
+|---|---|---|
+| codex-mini | 2025-05-16 | 2/23 regions |
+| gpt-4 | 0613 | 22/23 regions |
+| gpt-4-32k | 0613 | 20/23 regions |
+| gpt-4.1 | 2025-04-14 | All regions |
+| gpt-4.1-mini | 2025-04-14 | All regions |
+| gpt-4.1-nano | 2025-04-14 | All regions |
+| gpt-4o | 2024-05-13, 2024-08-06, 2024-11-20 | All regions |
+| gpt-4o-mini | 2024-07-18 | All regions |
+| gpt-4o-mini-realtime-preview | 2024-12-17 | 2/23 regions |
+| gpt-5-chat | 2025-08-07, 2025-10-03 | 2/23 regions |
+| gpt-5-mini | 2025-08-07 | All regions |
+| gpt-5-nano | 2025-08-07 | 22/23 regions |
+| gpt-5.1-chat | 2025-11-13 | 8/23 regions |
+| gpt-5.1-codex-mini | 2025-11-13 | 8/23 regions |
+| gpt-5.2-chat | 2025-12-11 | 2/23 regions |
+| o1 | 2024-12-17 | All regions |
+| o3-deep-research | 2025-06-26 | 2/23 regions |
+| o3-mini | 2025-01-31 | All regions |
+| o4-mini | 2025-04-16 | All regions |
+
+### Anthropic
+
+| Model | Version(s) | Availability |
+|---|---|---|
+| claude-haiku-4-5 | 20251001 | 2/23 regions |
+| claude-opus-4-1 | 20250805 | 2/23 regions |
+| claude-opus-4-5 | 20251101 | 2/23 regions |
+| claude-opus-4-6 | 1 | 2/23 regions |
+| claude-sonnet-4-5 | 20250929 | 2/23 regions |
+| claude-sonnet-4-6 | 1 | 2/23 regions |
+
+### DeepSeek
+
+| Model | Version(s) | Availability |
+|---|---|---|
+| DeepSeek-R1-0528 | 1 | 22/23 regions |
+| DeepSeek-V3-0324 | 1 | 22/23 regions |
+| DeepSeek-V3.1 | 1 | 22/23 regions |
+| DeepSeek-V3.2 | 1 | 22/23 regions |
+| DeepSeek-V3.2-Speciale | 1 | 22/23 regions |
+
+### Meta
+
+| Model | Version(s) | Availability |
+|---|---|---|
+| Llama-3.3-70B-Instruct | 1, 2, 3, 4, 5 | 22/23 regions |
+| Llama-4-Maverick-17B-128E-Instruct-FP8 | 1 | 22/23 regions |
+
+### Microsoft
+
+| Model | Version(s) | Availability |
+|---|---|---|
+| MAI-DS-R1 | 1 | 22/23 regions |
+
+### OpenAI-OSS
+
+| Model | Version(s) | Availability |
+|---|---|---|
+| gpt-oss-120b | 1 | 22/23 regions |
+
+### xAI
+
+| Model | Version(s) | Availability |
+|---|---|---|
+| grok-3 | 1 | 22/23 regions |
+| grok-3-mini | 1 | 22/23 regions |
+| grok-4-fast-non-reasoning | 1 | 22/23 regions |
+| grok-4-fast-reasoning | 1 | 22/23 regions |
+
+> Run `python scripts/list_models_with_responses_api_support.py` for the latest data from your own subscription.
+
 ---
 
 Powered by [Azure Developer CLI](https://aka.ms/azd) | Deploy any model on [Microsoft Foundry](https://ai.azure.com)
