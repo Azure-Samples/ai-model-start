@@ -8,12 +8,6 @@ using Azure.Identity;
 using OpenAI;
 using OpenAI.Responses;
 
-// Route to API key example if --apikey flag is passed
-if (args.Contains("--apikey"))
-{
-    return await ApiKeyExample.RunAsync();
-}
-
 var endpoint = Environment.GetEnvironmentVariable("AZURE_AI_PROJECT_ENDPOINT");
 if (string.IsNullOrEmpty(endpoint))
 {
@@ -37,7 +31,7 @@ options.AddPolicy(new ApiVersionPolicy("2025-11-15-preview"), PipelinePosition.B
 var client = new OpenAIClient(new ApiKeyCredential(token.Token), options);
 
 // --- Example 1: OpenAI model (gpt-4.1-mini) ---
-var openaiModel = "gpt-4.1-mini";
+var openaiModel = Environment.GetEnvironmentVariable("AZURE_MODEL_2_DEPLOYMENT_NAME") ?? "gpt-4.1-mini";
 Console.WriteLine($"Example 1: OpenAI model ({openaiModel})\n");
 Console.WriteLine("Waiting for response...");
 var responseClient1 = client.GetOpenAIResponseClient(openaiModel);
@@ -50,7 +44,7 @@ Console.WriteLine($"Status:   {result1.Value.Status}");
 Console.WriteLine($"Output tokens: {result1.Value.Usage.OutputTokenCount}\n");
 
 // --- Example 2: Non-OpenAI model (DeepSeek-R1-0528) ---
-var deepseekModel = "DeepSeek-R1-0528";
+var deepseekModel = Environment.GetEnvironmentVariable("AZURE_MODEL_DEPLOYMENT_NAME") ?? "DeepSeek-R1-0528";
 Console.WriteLine($"Example 2: Non-OpenAI model ({deepseekModel})\n");
 Console.WriteLine("Waiting for response (reasoning models can take 30-60s)...");
 var responseClient2 = client.GetOpenAIResponseClient(deepseekModel);

@@ -45,7 +45,7 @@ public class ResponsesExample {
                 .build();
 
         // --- Example 1: OpenAI model (gpt-4.1-mini) ---
-        String openaiModel = "gpt-4.1-mini";
+        String openaiModel = System.getenv().getOrDefault("AZURE_MODEL_2_DEPLOYMENT_NAME", "gpt-4.1-mini");
         System.out.printf("Example 1: OpenAI model (%s)%n%n", openaiModel);
         System.out.println("Waiting for response...");
         var response1 = client.responses().create(
@@ -61,7 +61,7 @@ public class ResponsesExample {
                 System.out.printf("Output tokens: %d%n%n", u.outputTokens()));
 
         // --- Example 2: Non-OpenAI model (DeepSeek-R1-0528) ---
-        String deepseekModel = "DeepSeek-R1-0528";
+        String deepseekModel = System.getenv().getOrDefault("AZURE_MODEL_DEPLOYMENT_NAME", "DeepSeek-R1-0528");
         System.out.printf("Example 2: Non-OpenAI model (%s)%n%n", deepseekModel);
         System.out.println("Waiting for response (reasoning models can take 30-60s)...");
         var response2 = client.responses().create(

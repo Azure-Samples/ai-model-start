@@ -22,24 +22,16 @@ param aiProjectName string = ''
 param resourceGroupName string = ''
 
 // ── Model deployment parameters ─────────────
+// NOTE: Model deployments are created via a postprovision hook
+// (scripts/deploy-models.ps1 / deploy-models.sh) because ARM
+// template validation does not yet support non-OpenAI model
+// formats (e.g., DeepSeek, Microsoft, Meta).
 
-@description('Name of the model to deploy (e.g., "DeepSeek-R1-0528", "Phi-4", "MAI-DS-R1").')
-param modelName string = 'DeepSeek-R1-0528'
+@description('Name of the primary model deployment (used for azd output only).')
+param deploymentName string = 'DeepSeek-R1-0528'
 
-@description('Format of the model (e.g., "DeepSeek", "Microsoft", "OpenAI").')
-param modelFormat string = 'DeepSeek'
-
-@description('Version of the model. Leave empty to omit (API picks default).')
-param modelVersion string = ''
-
-@description('Custom name for the deployment. Defaults to the model name.')
-param deploymentName string = ''
-
-@description('SKU name for the model deployment (e.g., "GlobalStandard", "Standard").')
-param deploymentSkuName string = 'GlobalStandard'
-
-@description('SKU capacity (tokens-per-minute in thousands).')
-param deploymentSkuCapacity int = 1
+@description('Name of the second model deployment (used for azd output only).')
+param deployment2Name string = 'gpt-4.1-mini'
 
 // ── Tags ─────────────────────────────────────
 
@@ -52,7 +44,6 @@ param tags object = {}
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var effectiveFoundryName = !empty(aiFoundryName) ? aiFoundryName : 'foundry-${resourceToken}'
 var effectiveProjectName = !empty(aiProjectName) ? aiProjectName : '${effectiveFoundryName}-proj'
-var effectiveDeploymentName = !empty(deploymentName) ? deploymentName : modelName
 var effectiveTags = union(tags, { 'azd-env-name': environmentName })
 
 // ──────────────────────────────────────────────
@@ -77,12 +68,6 @@ module foundry 'foundry.bicep' = {
     aiProjectName: effectiveProjectName
     location: location
     tags: effectiveTags
-    modelName: modelName
-    modelFormat: modelFormat
-    modelVersion: modelVersion
-    deploymentName: effectiveDeploymentName
-    deploymentSkuName: deploymentSkuName
-    deploymentSkuCapacity: deploymentSkuCapacity
   }
 }
 
@@ -95,4 +80,5 @@ output AZURE_AI_FOUNDRY_NAME string = foundry.outputs.aiFoundryName
 output AZURE_AI_FOUNDRY_ENDPOINT string = foundry.outputs.aiFoundryEndpoint
 output AZURE_AI_PROJECT_NAME string = foundry.outputs.aiProjectName
 output AZURE_AI_PROJECT_ENDPOINT string = '${foundry.outputs.aiFoundryEndpoint}api/projects/${foundry.outputs.aiProjectName}'
-output AZURE_MODEL_DEPLOYMENT_NAME string = effectiveDeploymentName
+output AZURE_MODEL_DEPLOYMENT_NAME string = deploymentName
+output AZURE_MODEL_2_DEPLOYMENT_NAME string = deployment2Name

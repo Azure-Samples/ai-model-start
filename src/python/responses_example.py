@@ -40,7 +40,7 @@ def main():
     )
 
     # --- Example 1: OpenAI model (gpt-4.1-mini) ---
-    openai_model = "gpt-4.1-mini"
+    openai_model = os.environ.get("AZURE_MODEL_2_DEPLOYMENT_NAME", "gpt-4.1-mini")
     print(f"Example 1: OpenAI model ({openai_model})\n")
     print("Waiting for response...", flush=True)
     response = client.responses.create(
@@ -53,7 +53,7 @@ def main():
     print(f"Output tokens: {response.usage.output_tokens}\n")
 
     # --- Example 2: Non-OpenAI model (DeepSeek-R1-0528) ---
-    deepseek_model = "DeepSeek-R1-0528"
+    deepseek_model = os.environ.get("AZURE_MODEL_DEPLOYMENT_NAME", "DeepSeek-R1-0528")
     print(f"Example 2: Non-OpenAI model ({deepseek_model})\n")
     print("Waiting for response (reasoning models can take 30-60s)...", flush=True)
     response = client.responses.create(

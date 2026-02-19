@@ -2,11 +2,11 @@
 
 ## Architecture
 
-This is an **Azure Developer CLI (azd) template** that deploys a Microsoft Foundry account with a model and provides working examples in **Python, TypeScript, C#, Java, and Go** to call it.
+This is an **Azure Developer CLI (azd) template** that deploys a Microsoft Foundry account with two models (DeepSeek-R1-0528 and gpt-4.1-mini by default) and provides working examples in **Python, TypeScript, C#, Java, and Go** to call them.
 
-- **Infra layer** (`infra/`): Subscription-scoped Bicep. [main.bicep](../infra/main.bicep) creates the resource group and delegates to [foundry.bicep](../infra/foundry.bicep), which provisions `Microsoft.CognitiveServices/accounts` (kind `AIServices`), a project sub-resource, and a model deployment.
+- **Infra layer** (`infra/`): Subscription-scoped Bicep. [main.bicep](../infra/main.bicep) creates the resource group and delegates to [foundry.bicep](../infra/foundry.bicep), which provisions `Microsoft.CognitiveServices/accounts` (kind `AIServices`) and a project sub-resource. Model deployments are created by **postprovision hook scripts** (`scripts/deploy-models.ps1` / `scripts/deploy-models.sh`) via Azure CLI, because ARM template validation [rejects non-OpenAI model formats](https://github.com/Azure-Samples/ai-model-start/issues/4).
 - **App layer** (`src/`): One self-contained example per language, each using the **Responses API** with that language's standard **OpenAI SDK** (not Azure-specific SDK wrappers). There is no web app, API server, or deployment target — only local scripts.
-- **Glue**: [azure.yaml](../azure.yaml) wires azd to the Bicep infra. Environment variables flow from Bicep outputs → azd env → app code via `os.environ` (or equivalent).
+- **Glue**: [azure.yaml](../azure.yaml) wires azd to the Bicep infra and defines postprovision hooks for model deployment. Environment variables flow from Bicep outputs → azd env → hook scripts → app code via `os.environ` (or equivalent).
 
 ## Key Conventions
 
@@ -104,21 +104,22 @@ client := openai.NewClient(
 ```
 
 ### Authentication
-Prefer **keyless** via `DefaultAzureCredential` (EntraID) for production. Users need the `Cognitive Services OpenAI User` role on the Microsoft Foundry account. Token audience is always `https://ai.azure.com/.default`.
-
-API key authentication is also available for quick dev/test. API key examples use the **account endpoint** (`AZURE_AI_FOUNDRY_ENDPOINT`) with `/openai/v1` — no `api-version` query parameter needed. EntraID examples use the **project endpoint** (`AZURE_AI_PROJECT_ENDPOINT`) with `/openai` and `api-version=2025-11-15-preview`.
+Use **keyless** via `DefaultAzureCredential` (EntraID). Users need the `Azure AI Developer` role on the Microsoft Foundry account. Token audience is always `https://ai.azure.com/.default`.
 
 ### Environment variables
 Set from `azd env get-values` after provisioning:
-- `AZURE_AI_PROJECT_ENDPOINT` — the project endpoint; used as `base_url` with `/openai` suffix for EntraID auth
-- `AZURE_AI_FOUNDRY_ENDPOINT` — the account endpoint; used as `base_url` with `/openai/v1` suffix for API key auth
-- `AZURE_AI_API_KEY` — API key for the Foundry account (only for API key auth, obtained via `az cognitiveservices account keys list`)
+- `AZURE_AI_PROJECT_ENDPOINT` — the project endpoint; used as `base_url` with `/openai` suffix
+- `AZURE_MODEL_DEPLOYMENT_NAME` — primary model deployment name (default: `DeepSeek-R1-0528`); read by samples for example 2
+- `AZURE_MODEL_2_DEPLOYMENT_NAME` — second model deployment name (default: `gpt-4.1-mini`); read by all samples for example 1
+
+Sample code reads model names from `AZURE_MODEL_DEPLOYMENT_NAME` and `AZURE_MODEL_2_DEPLOYMENT_NAME` env vars, falling back to `DeepSeek-R1-0528` and `gpt-4.1-mini` respectively if not set.
 
 ### Bicep conventions
 - Target scope is `subscription` in `main.bicep`; resource-group-scoped resources go in `foundry.bicep` module.
 - API version: `2025-06-01` for all `Microsoft.CognitiveServices` resources.
 - Resource naming uses `uniqueString(subscription().id, environmentName, location)` for uniqueness.
-- Model config (name, format, version, SKU) is parameterized and overridable via `azd env set`.
+- **Model deployments are NOT in Bicep** — they are created by postprovision hook scripts via Azure CLI, because ARM validation rejects non-OpenAI model formats.
+- The second model deployment is optional — set `AZURE_MODEL_2_NAME` to empty string to skip it.
 
 ## Developer Workflow
 
@@ -135,19 +136,12 @@ azd up
 # Set environment variables
 $env:AZURE_AI_PROJECT_ENDPOINT = azd env get-value 'AZURE_AI_PROJECT_ENDPOINT'
 
-# Run any example (EntraID - recommended)
+# Run any example
 cd src/python   && pip install -r requirements.txt && python responses_example.py
 cd src/typescript && npm install && npx tsx responses_example.ts
 cd src/csharp   && dotnet run
 cd src/java     && mvn -q compile exec:java
 cd src/go       && go run .
-
-# Run API key examples (quick dev/test)
-cd src/python   && python responses_example_apikey.py
-cd src/typescript && npx tsx responses_example_apikey.ts
-cd src/csharp   && dotnet run -- --apikey
-cd src/java     && mvn -q compile exec:java -Dexec.mainClass=ResponsesExampleApiKey
-cd src/go/apikey && go run .
 
 # Tear down all resources
 azd down --purge

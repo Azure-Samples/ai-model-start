@@ -55,34 +55,29 @@ block-beta
 az login
 azd auth login
 
-# 2. Deploy DeepSeek-R1-0528 to Microsoft Foundry
+# 2. Deploy DeepSeek-R1-0528 and gpt-4.1-mini to Microsoft Foundry
 azd up
 ```
 
-That's it! You now have a Microsoft Foundry account with a model deployed and ready to use.
+That's it! You now have a Microsoft Foundry account with both models deployed and ready to use.
 
 ## Next Steps
 
-### Option A: Keyless Authentication (Recommended)
-
-Use EntraID keyless authentication — the secure, production-ready approach. No secrets to manage.
-
-<details>
-<summary>Click to expand keyless setup and code examples</summary>
-
-#### Set up your environment
+### Set up your environment
 
 ```powershell
 # 1. Set the project endpoint environment variable
 $env:AZURE_AI_PROJECT_ENDPOINT = azd env get-value 'AZURE_AI_PROJECT_ENDPOINT'
 
-# 2. Assign yourself the Cognitive Services OpenAI User role
+# 2. Assign yourself the Azure AI Developer role
 $userId = az ad signed-in-user show --query id -o tsv
 $resourceId = "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-$(azd env get-value 'AZURE_ENV_NAME')/providers/Microsoft.CognitiveServices/accounts/$(azd env get-value 'AZURE_AI_FOUNDRY_NAME')"
-az role assignment create --role "Cognitive Services OpenAI User" --assignee $userId --scope $resourceId
+az role assignment create --role "Azure AI Developer" --assignee $userId --scope $resourceId
 ```
 
-#### Run an example
+> **Note:** Role assignments can take up to 5 minutes to propagate. If you see 401/403 errors, wait a few minutes and retry.
+
+### Run an example
 
 Each example calls both an **OpenAI model** (gpt-4.1-mini) and a **non-OpenAI model** (DeepSeek-R1-0528) using the Responses API.
 
@@ -118,7 +113,7 @@ cd src/go
 go run .
 ```
 
-#### The pattern (every language)
+### The pattern (every language)
 
 All five examples follow the same pattern:
 
@@ -127,7 +122,7 @@ All five examples follow the same pattern:
 3. **Pass `api-version`** as a query parameter (`2025-11-15-preview`)
 4. **Call the Responses API** — works with any deployed model
 
-#### Python code sample
+### Python code sample
 
 ```python
 import os
@@ -153,85 +148,14 @@ response = client.responses.create(
 print(response.output_text)
 ```
 
-</details>
+### The pattern (every language)
 
-### Option B: API Key Authentication (Quick Start)
+All five examples follow the same pattern:
 
-For quick testing and development — get started in seconds with an API key.
-
-> **Note:** API keys are less secure than keyless auth. Use Option A for production workloads.
-
-<details>
-<summary>Click to expand API key setup and code examples</summary>
-
-#### Get your API key
-
-```powershell
-# 1. Set the account endpoint
-$env:AZURE_AI_FOUNDRY_ENDPOINT = azd env get-value 'AZURE_AI_FOUNDRY_ENDPOINT'
-
-# 2. Get the API key from your Foundry account
-$env:AZURE_AI_API_KEY = az cognitiveservices account keys list `
-    --name $(azd env get-value 'AZURE_AI_FOUNDRY_NAME') `
-    --resource-group "rg-$(azd env get-value 'AZURE_ENV_NAME')" `
-    --query key1 -o tsv
-```
-
-#### Run an example
-
-**Python**
-```bash
-cd src/python
-pip install -r requirements.txt
-python responses_example_apikey.py
-```
-
-**TypeScript**
-```bash
-cd src/typescript
-npm install
-npx tsx responses_example_apikey.ts
-```
-
-**C#**
-```bash
-cd src/csharp
-dotnet run -- --apikey
-```
-
-**Java** (requires Maven)
-```bash
-cd src/java
-mvn -q compile exec:java -Dexec.mainClass=ResponsesExampleApiKey
-```
-
-**Go**
-```bash
-cd src/go/apikey
-go run .
-```
-
-#### Python code sample (API key)
-
-```python
-import os
-from openai import OpenAI
-
-endpoint = os.environ["AZURE_AI_FOUNDRY_ENDPOINT"]
-client = OpenAI(
-    base_url=endpoint.rstrip("/") + "/openai/v1",
-    api_key=os.environ["AZURE_AI_API_KEY"],
-)
-
-response = client.responses.create(
-    model="gpt-4.1-mini",
-    input="Explain quantum computing in simple terms",
-    max_output_tokens=1000,
-)
-print(response.output_text)
-```
-
-</details>
+1. **Get an EntraID token** via `DefaultAzureCredential` (scoped to `https://ai.azure.com/.default`)
+2. **Create a standard OpenAI client** with `base_url` = project endpoint + `/openai`
+3. **Pass `api-version`** as a query parameter (`2025-11-15-preview`)
+4. **Call the Responses API** — works with any deployed model
 
 **Why the standard OpenAI SDK?**
 
@@ -239,9 +163,9 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and pa
 
 ## What This Template Includes
 
-- **Core Infrastructure**: Microsoft Foundry account + project with a model deployment
+- **Core Infrastructure**: Microsoft Foundry account + project with two model deployments
 - **Optimal Configuration**: GlobalStandard SKU, flexible region and model selection
-- **Secure Authentication**: EntraID (keyless) via `DefaultAzureCredential` + API key option for quick dev/test
+- **Secure Authentication**: EntraID (keyless) via `DefaultAzureCredential` — no API keys or secrets to manage
 - **Multi-language examples**: Python, TypeScript, C#, Java, and Go — all using their standard OpenAI SDK
 - **Complete Documentation**: Setup guide with troubleshooting tips
 
@@ -252,44 +176,39 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and pa
 - **Microsoft Foundry project** — Full project workspace for your development team
 - **Standard OpenAI SDKs** — Use each language's `openai` library directly, no Azure-specific wrappers
 - **Responses API support** — Modern API, cleaner than Chat Completions
-- **Keyless authentication** — Secure EntraID auth, no API keys to manage (API key option also available for quick dev/test)
+- **Keyless authentication** — Secure EntraID auth, no API keys to manage
 - **Unique resource naming** — No conflicts with existing resources
 
 ## Template Structure
 
 ```
-├── azure.yaml                 # azd configuration
+├── azure.yaml                 # azd configuration (includes postprovision hooks)
 ├── infra/
 │   ├── main.bicep             # Main deployment template (subscription-scoped)
 │   ├── main.parameters.json   # Deployment parameters
-│   └── foundry.bicep          # Microsoft Foundry account, project, and model deployment
+│   └── foundry.bicep          # Microsoft Foundry account and project
 ├── scripts/
+│   ├── deploy-models.ps1      # Postprovision: deploy models via CLI (Windows)
+│   ├── deploy-models.sh       # Postprovision: deploy models via CLI (Linux/macOS)
 │   ├── list_models_with_responses_api_support.py  # Utility: list models supporting the Responses API
 │   └── requirements.txt       # Dependencies for scripts (control plane)
 ├── src/
 │   ├── python/
-│   │   ├── responses_example.py         # Python: EntraID auth (recommended)
-│   │   ├── responses_example_apikey.py   # Python: API key auth (quick start)
+│   │   ├── responses_example.py         # Python example
 │   │   └── requirements.txt
 │   ├── typescript/
-│   │   ├── responses_example.ts         # TypeScript: EntraID auth (recommended)
-│   │   ├── responses_example_apikey.ts   # TypeScript: API key auth (quick start)
+│   │   ├── responses_example.ts         # TypeScript example
 │   │   ├── package.json
 │   │   └── tsconfig.json
 │   ├── csharp/
-│   │   ├── Program.cs                   # C#: EntraID auth (recommended)
-│   │   ├── ProgramApiKey.cs             # C#: API key auth (quick start, run with --apikey)
+│   │   ├── Program.cs                   # C# example
 │   │   └── FoundryModelsExample.csproj
 │   ├── java/
-│   │   ├── src/main/java/ResponsesExample.java          # Java: EntraID auth (recommended)
-│   │   ├── src/main/java/ResponsesExampleApiKey.java    # Java: API key auth (quick start)
+│   │   ├── src/main/java/ResponsesExample.java  # Java example
 │   │   └── pom.xml
 │   └── go/
-│       ├── main.go                      # Go: EntraID auth (recommended)
-│       ├── go.mod
-│       └── apikey/
-│           ├── main.go                  # Go: API key auth (quick start)
-│           └── go.mod
+│       ├── main.go                      # Go example
+│       └── go.mod
 └── README.md
 ```
 
@@ -305,16 +224,22 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and pa
 
 ## Configuration
 
-Set any of these via `azd env set` before running `azd up`:
+Model deployments are created by postprovision hook scripts (`scripts/deploy-models.ps1` / `scripts/deploy-models.sh`), which run automatically after `azd up` provisions the Foundry account. Configure models via `azd env set` before running `azd up`:
 
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `AZURE_MODEL_NAME` | No | `DeepSeek-R1-0528` | Model to deploy |
-| `AZURE_MODEL_FORMAT` | No | `DeepSeek` | Model format (`DeepSeek`, `Microsoft`, `OpenAI`, etc.) |
-| `AZURE_MODEL_VERSION` | No | *(latest)* | Specific model version |
-| `AZURE_DEPLOYMENT_NAME` | No | Same as model name | Custom deployment name |
-| `AZURE_DEPLOYMENT_SKU_NAME` | No | `GlobalStandard` | SKU tier |
-| `AZURE_DEPLOYMENT_SKU_CAPACITY` | No | `1` | Capacity (tokens-per-minute in thousands) |
+| Variable | Default | Description |
+|---|---|---|
+| `AZURE_MODEL_NAME` | `DeepSeek-R1-0528` | Primary model to deploy |
+| `AZURE_MODEL_FORMAT` | `DeepSeek` | Primary model format (`DeepSeek`, `Microsoft`, `OpenAI`, etc.) |
+| `AZURE_MODEL_VERSION` | `1` | Primary model version |
+| `AZURE_MODEL_DEPLOYMENT_NAME` | Same as model name | Custom deployment name for primary model |
+| `AZURE_MODEL_SKU_NAME` | `GlobalStandard` | Primary model SKU tier |
+| `AZURE_MODEL_SKU_CAPACITY` | `10` | Primary model capacity (tokens-per-minute in thousands) |
+| `AZURE_MODEL_2_NAME` | `gpt-4.1-mini` | Second model to deploy (empty string to skip) |
+| `AZURE_MODEL_2_FORMAT` | `OpenAI` | Second model format |
+| `AZURE_MODEL_2_VERSION` | `2025-04-14` | Second model version |
+| `AZURE_MODEL_2_DEPLOYMENT_NAME` | Same as model name | Custom deployment name for second model |
+| `AZURE_MODEL_2_SKU_NAME` | `GlobalStandard` | Second model SKU tier |
+| `AZURE_MODEL_2_SKU_CAPACITY` | `10` | Second model capacity |
 
 ### Example: DeepSeek-R1-0528 (Default)
 
@@ -355,10 +280,10 @@ After `azd up`, available via `azd env get-values`:
 |---|---|
 | `AZURE_RESOURCE_GROUP` | Resource group name |
 | `AZURE_AI_FOUNDRY_NAME` | Microsoft Foundry account name |
-| `AZURE_AI_FOUNDRY_ENDPOINT` | Account endpoint URL |
 | `AZURE_AI_PROJECT_NAME` | Foundry project name |
 | `AZURE_AI_PROJECT_ENDPOINT` | Project endpoint URL (use as `base_url` with `/openai` suffix) |
-| `AZURE_MODEL_DEPLOYMENT_NAME` | Model deployment name |
+| `AZURE_MODEL_DEPLOYMENT_NAME` | Primary model deployment name |
+| `AZURE_MODEL_2_DEPLOYMENT_NAME` | Second model deployment name |
 
 ## Common Commands
 
@@ -409,23 +334,29 @@ python list_models_with_responses_api_support.py --non-openai --locations
 
 > **Note:** The ARM control plane tags OpenAI-format models with `capabilities.responses`. For non-OpenAI models, `capabilities.agentsV2` is used as a proxy — models with this capability support the Responses API at runtime. The default run combines both into a single unified list.
 
+## Known Issues
+
+| Issue | Summary | Workaround |
+|---|---|---|
+| [ARM validation rejects non-OpenAI models](https://github.com/Azure-Samples/ai-model-start/issues/4) | Bicep/ARM template deployment fails for non-OpenAI model formats (DeepSeek, Meta, Microsoft) with `DeploymentModelNotSupported`. | This template uses **postprovision hook scripts** that deploy models via Azure CLI, bypassing ARM validation. No action needed. |
+| [Java SDK `putQueryParam` bug](https://github.com/Azure-Samples/ai-model-start/issues/3) | `openai-java` v4.21.0 `putQueryParam("api-version", ...)` silently drops the query parameter, causing `400: API version not supported` errors with EntraID auth. | Wait for an SDK fix. The Java example is included for reference but may not work until this is resolved. |
+| [API key endpoint limitation](https://github.com/Azure-Samples/ai-model-start/issues/5) | The account-level API key endpoint (`/openai/v1`) does not support the Responses API for non-OpenAI models. | This template uses **EntraID authentication** with the project endpoint, which supports all models. |
+
 ## Troubleshooting
 
-**"DeploymentModelNotSupported"** — Some models can't be deployed via Bicep validation. Try a different model or deploy manually via Azure CLI: `az cognitiveservices account deployment create ...`.
+**401 / 403 "Permission denied"** — You need the `Azure AI Developer` role on the Foundry account. Run the role assignment command from [Set up your environment](#set-up-your-environment). Role assignments can take up to 5 minutes to propagate.
 
-**"Quota exceeded"** — Check your subscription's quota for the selected model in the target region.
+**"DeploymentModelNotSupported" during `azd up`** — This shouldn't happen with the default configuration (models are deployed via CLI hooks, not Bicep). If you see this, ensure you're using the latest version of this template.
 
-**"Permission denied" / 401** — Assign yourself the `Cognitive Services OpenAI User` role on the Microsoft Foundry account.
+**"Quota exceeded"** — Check your subscription's quota for the selected model in the target region. Try a different region or model.
 
-**429 Rate limited** — Increase `AZURE_DEPLOYMENT_SKU_CAPACITY` or try a different model with more available capacity.
+**429 Rate limited** — Increase `AZURE_MODEL_SKU_CAPACITY` or try a different model with more available capacity.
 
-**"api-version query parameter is not allowed when using /v1 path"** — The `/v1` path rejects `api-version`. Use the correct path for your auth method:
-- **EntraID auth**: `project_endpoint + /openai` with `api-version=2025-11-15-preview` as a query parameter
-- **API key auth**: `account_endpoint + /openai/v1` with **no** `api-version`
+**"api-version is required"** / **"Missing required query string parameter 'api-version'"** — You're using the `/openai` path without passing `api-version`. Add `api-version=2025-11-15-preview` as a query parameter. All examples show how to do this.
 
-**"api-version is required"** / **"Missing required query string parameter 'api-version'"** — You're using the `/openai` path without passing `api-version`. Add `api-version=2025-11-15-preview` as a query parameter. Each language example shows how to do this.
+**"UnsupportedApiVersion"** — The SDK is sending its default api-version (which isn't supported). Set `api-version=2025-11-15-preview` as a query parameter explicitly.
 
-**"UnsupportedApiVersion"** — You're using a path that requires `api-version` but didn't set it explicitly, so the SDK is sending its default (which isn't supported). Set `api-version=2025-11-15-preview` as a query parameter, or switch to the `/openai/v1` path with API key auth (which doesn't need `api-version`).
+**Java `400: API version not supported`** — This is a [known SDK bug](https://github.com/Azure-Samples/ai-model-start/issues/3). The Java OpenAI SDK's `putQueryParam` doesn't correctly append the api-version. Wait for an SDK fix.
 
 Need debug info? Run `azd up --debug` for detailed logs.
 
@@ -437,7 +368,7 @@ Need debug info? Run `azd up --debug` for detailed logs.
 - **Modern API** — Uses the Responses API, not legacy Chat Completions
 - **Standard SDKs** — Uses each language's OpenAI SDK directly, no Azure-specific wrappers
 - **Production-ready** — GlobalStandard SKU, EntraID auth, proper naming
-- **Secure by default** — Keyless authentication with Azure Identity
+- **Secure by default** — Keyless EntraID authentication with Azure Identity
 - **Easy cleanup** — Remove everything with `azd down --purge`
 
 ## Foundry Models with Responses API Support

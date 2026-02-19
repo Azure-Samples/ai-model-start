@@ -36,7 +36,7 @@ async function main() {
   });
 
   // --- Example 1: OpenAI model (gpt-4.1-mini) ---
-  const openaiModel = "gpt-4.1-mini";
+  const openaiModel = process.env.AZURE_MODEL_2_DEPLOYMENT_NAME ?? "gpt-4.1-mini";
   console.log(`Example 1: OpenAI model (${openaiModel})\n`);
   console.log("Waiting for response...");
   const response1 = await client.responses.create({
@@ -49,7 +49,7 @@ async function main() {
   console.log(`Output tokens: ${response1.usage?.output_tokens}\n`);
 
   // --- Example 2: Non-OpenAI model (DeepSeek-R1-0528) ---
-  const deepseekModel = "DeepSeek-R1-0528";
+  const deepseekModel = process.env.AZURE_MODEL_DEPLOYMENT_NAME ?? "DeepSeek-R1-0528";
   console.log(`Example 2: Non-OpenAI model (${deepseekModel})\n`);
   console.log("Waiting for response (reasoning models can take 30-60s)...");
   const response2 = await client.responses.create({

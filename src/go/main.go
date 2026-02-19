@@ -50,7 +50,10 @@ func main() {
 	)
 
 	// --- Example 1: OpenAI model (gpt-4.1-mini) ---
-	openaiModel := "gpt-4.1-mini"
+	openaiModel := os.Getenv("AZURE_MODEL_2_DEPLOYMENT_NAME")
+	if openaiModel == "" {
+		openaiModel = "gpt-4.1-mini"
+	}
 	fmt.Printf("Example 1: OpenAI model (%s)\n\n", openaiModel)
 	fmt.Println("Waiting for response...")
 	resp1, err := client.Responses.New(ctx, responses.ResponseNewParams{
@@ -69,7 +72,10 @@ func main() {
 	fmt.Printf("Output tokens: %d\n\n", resp1.Usage.OutputTokens)
 
 	// --- Example 2: Non-OpenAI model (DeepSeek-R1-0528) ---
-	deepseekModel := "DeepSeek-R1-0528"
+	deepseekModel := os.Getenv("AZURE_MODEL_DEPLOYMENT_NAME")
+	if deepseekModel == "" {
+		deepseekModel = "DeepSeek-R1-0528"
+	}
 	fmt.Printf("Example 2: Non-OpenAI model (%s)\n\n", deepseekModel)
 	fmt.Println("Waiting for response (reasoning models can take 30-60s)...")
 	resp2, err := client.Responses.New(ctx, responses.ResponseNewParams{

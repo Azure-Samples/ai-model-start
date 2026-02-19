@@ -15,24 +15,11 @@ param location string
 param tags object = {}
 
 // ── Model deployment parameters ─────────────
-
-@description('Name of the model to deploy.')
-param modelName string
-
-@description('Format of the model (e.g., "OpenAI", "Microsoft").')
-param modelFormat string
-
-@description('Version of the model.')
-param modelVersion string = ''
-
-@description('Name for the deployment.')
-param deploymentName string
-
-@description('SKU name for the deployment.')
-param deploymentSkuName string = 'GlobalStandard'
-
-@description('SKU capacity for the deployment.')
-param deploymentSkuCapacity int = 1
+// NOTE: Model deployments are created via a postprovision hook
+// (scripts/deploy-models.ps1 / deploy-models.sh) because ARM
+// template validation does not yet support non-OpenAI model
+// formats (e.g., DeepSeek, Microsoft, Meta). The CLI bypasses
+// this validation and works for all model formats.
 
 // ──────────────────────────────────────────────
 // Microsoft Foundry account
@@ -74,31 +61,6 @@ resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = 
     type: 'SystemAssigned'
   }
   properties: {}
-}
-
-// ──────────────────────────────────────────────
-// Model deployment
-//   Deploy any Foundry model to use in playground,
-//   agents and other tools.
-// ──────────────────────────────────────────────
-
-resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = {
-  parent: aiFoundry
-  name: deploymentName
-  sku: {
-    capacity: deploymentSkuCapacity
-    name: deploymentSkuName
-  }
-  properties: {
-    model: {
-      name: modelName
-      format: modelFormat
-      version: !empty(modelVersion) ? modelVersion : null
-    }
-  }
-  dependsOn: [
-    aiProject
-  ]
 }
 
 // ──────────────────────────────────────────────

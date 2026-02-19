@@ -5,3 +5,11 @@ metadata:
 infra:
   provider: bicep
   path: infra
+hooks:
+  postprovision:
+    windows:
+      shell: pwsh
+      run: scripts/deploy-models.ps1
+    posix:
+      shell: sh
+      run: scripts/deploy-models.sh

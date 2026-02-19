@@ -149,14 +149,30 @@ def list_responses_models(subscription_id=None, show_locations=False, non_openai
     print(f"  {'Model':<35} {'Format':<15} {'Versions':<20} {'Locations'}")
     print(f"  {'-'*35} {'-'*15} {'-'*20} {'-'*20}")
 
+    def summarize_locations(model_locations):
+        """Summarize region availability like the README:
+        - All regions
+        - All except region1, region2 (1-3 missing)
+        - region1, region2 (1-3 present)
+        - N/total regions (otherwise)
+        """
+        if model_locations >= all_locations_set:
+            return "All regions"
+        missing = sorted(all_locations_set - model_locations)
+        present = sorted(model_locations)
+        if 1 <= len(missing) <= 3:
+            return "All except " + ", ".join(missing)
+        if 1 <= len(present) <= 3:
+            return ", ".join(present)
+        return f"{len(model_locations)}/{len(LOCATIONS)} regions"
+
     for (fmt, name), info in sorted(models.items()):
         model_locations = set()
         for locs in info["versions"].values():
             model_locations |= locs
 
         versions = ", ".join(sorted(info["versions"].keys()))
-        is_global = model_locations >= all_locations_set
-        location_summary = "All regions" if is_global else f"{len(model_locations)}/{len(LOCATIONS)} regions"
+        location_summary = summarize_locations(model_locations)
 
         print(f"  {name:<35} {fmt:<15} {versions:<20} {location_summary}")
 
