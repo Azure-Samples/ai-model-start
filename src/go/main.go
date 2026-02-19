@@ -11,13 +11,13 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/option"
-	"github.com/openai/openai-go/responses"
+	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/option"
+	"github.com/openai/openai-go/v3/responses"
 )
 
 func main() {
-	fmt.Println("Microsoft Foundry Models - Responses API (Plain OpenAI SDK - Go)\n")
+	fmt.Fprintln(os.Stdout, "Microsoft Foundry Models - Responses API (Plain OpenAI SDK - Go)\n")
 
 	endpoint := os.Getenv("AZURE_AI_PROJECT_ENDPOINT")
 	if endpoint == "" {
