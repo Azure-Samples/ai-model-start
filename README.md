@@ -72,10 +72,10 @@ After `azd up`, a `.env` file is automatically created in the project root with 
 # 1. Load environment variables (set -a auto-exports for child processes)
 set -a; source .env; set +a
 
-# 2. Assign yourself the Azure AI Developer role
+# 2. Assign yourself the Cognitive Services User role
 userId=$(az ad signed-in-user show --query id -o tsv)
 resourceId="/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-$(azd env get-value 'AZURE_ENV_NAME')/providers/Microsoft.CognitiveServices/accounts/$(azd env get-value 'AZURE_AI_FOUNDRY_NAME')"
-az role assignment create --role "Azure AI Developer" --assignee $userId --scope $resourceId
+az role assignment create --role "Cognitive Services User" --assignee $userId --scope $resourceId
 ```
 
 **PowerShell / Windows**
@@ -83,10 +83,10 @@ az role assignment create --role "Azure AI Developer" --assignee $userId --scope
 # 1. Load environment variables
 Get-Content .env | ForEach-Object { if ($_ -match '^([^#=]+)=(.*)$') { [Environment]::SetEnvironmentVariable($matches[1], $matches[2]) } }
 
-# 2. Assign yourself the Azure AI Developer role
+# 2. Assign yourself the Cognitive Services User role
 $userId = az ad signed-in-user show --query id -o tsv
 $resourceId = "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-$(azd env get-value 'AZURE_ENV_NAME')/providers/Microsoft.CognitiveServices/accounts/$(azd env get-value 'AZURE_AI_FOUNDRY_NAME')"
-az role assignment create --role "Azure AI Developer" --assignee $userId --scope $resourceId
+az role assignment create --role "Cognitive Services User" --assignee $userId --scope $resourceId
 ```
 
 > **Note:** Role assignments can take up to 5 minutes to propagate. If you see 401/403 errors, wait a few minutes and retry.
@@ -347,7 +347,7 @@ python list_models_with_responses_api_support.py --non-openai --locations
 
 ## Troubleshooting
 
-**401 / 403 "Permission denied"** — You need the `Azure AI Developer` role on the Foundry account. Run the role assignment command from [Set up your environment](#set-up-your-environment). Role assignments can take up to 5 minutes to propagate.
+**401 / 403 "Permission denied"** — You need the `Cognitive Services User` role on the Foundry account. Run the role assignment command from [Set up your environment](#set-up-your-environment). Role assignments can take up to 5 minutes to propagate.
 
 **"DeploymentModelNotSupported" during `azd up`** — Ensure the model format matches the model name (e.g., `DeepSeek` format for DeepSeek models, `OpenAI` for GPT models). Check available models with `az cognitiveservices model list -l <location> --query "[?model.format=='YourFormat']"`. See `scripts/list_models_with_responses_api_support.py` for discovery.
 

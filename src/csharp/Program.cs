@@ -34,10 +34,10 @@ var client = new OpenAIClient(new ApiKeyCredential(token.Token), options);
 var openaiModel = Environment.GetEnvironmentVariable("AZURE_MODEL_2_DEPLOYMENT_NAME") ?? "gpt-4.1-mini";
 Console.WriteLine($"Example 1: OpenAI model ({openaiModel})\n");
 Console.WriteLine("Waiting for response...");
-var responseClient1 = client.GetOpenAIResponseClient(openaiModel);
-var result1 = await responseClient1.CreateResponseAsync(
-    "Explain quantum computing in 3 sentences.",
-    new ResponseCreationOptions { MaxOutputTokenCount = 500 }
+var responseClient1 = client.GetResponsesClient(openaiModel);
+var result1 = await responseClient1.CreateResponseAsync(new CreateResponseOptions(
+    [ResponseItem.CreateUserMessageItem("Explain quantum computing in 3 sentences.")])
+    { MaxOutputTokenCount = 500 }
 );
 Console.WriteLine($"Response: {result1.Value.GetOutputText()}");
 Console.WriteLine($"Status:   {result1.Value.Status}");
@@ -47,10 +47,10 @@ Console.WriteLine($"Output tokens: {result1.Value.Usage.OutputTokenCount}\n");
 var deepseekModel = Environment.GetEnvironmentVariable("AZURE_MODEL_DEPLOYMENT_NAME") ?? "DeepSeek-R1-0528";
 Console.WriteLine($"Example 2: Non-OpenAI model ({deepseekModel})\n");
 Console.WriteLine("Waiting for response (reasoning models can take 30-60s)...");
-var responseClient2 = client.GetOpenAIResponseClient(deepseekModel);
-var result2 = await responseClient2.CreateResponseAsync(
-    "What are the top 3 benefits of cloud computing? Be concise.",
-    new ResponseCreationOptions { MaxOutputTokenCount = 500 }
+var responseClient2 = client.GetResponsesClient(deepseekModel);
+var result2 = await responseClient2.CreateResponseAsync(new CreateResponseOptions(
+    [ResponseItem.CreateUserMessageItem("What are the top 3 benefits of cloud computing? Be concise.")])
+    { MaxOutputTokenCount = 500 }
 );
 Console.WriteLine($"Response: {result2.Value.GetOutputText()}");
 Console.WriteLine($"Status:   {result2.Value.Status}");

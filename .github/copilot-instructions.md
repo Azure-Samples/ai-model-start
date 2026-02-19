@@ -70,7 +70,12 @@ options.AddPolicy(new ApiVersionPolicy("2025-11-15-preview"), PipelinePosition.B
 var client = new OpenAIClient(
     new ApiKeyCredential(token.Token),
     options with { Endpoint = new Uri(endpoint.TrimEnd('/') + "/openai") });
-var responsesClient = client.GetResponseClient();
+var responsesClient = client.GetResponsesClient("gpt-4.1-mini");
+var response = await responsesClient.CreateResponseAsync(new CreateResponseOptions(
+    [ResponseItem.CreateUserMessageItem("...")])
+    { MaxOutputTokenCount = 500 }
+);
+Console.WriteLine(response.Value.GetOutputText());
 ```
 
 ### Java SDK pattern
@@ -104,7 +109,7 @@ client := openai.NewClient(
 ```
 
 ### Authentication
-Use **keyless** via `DefaultAzureCredential` (EntraID). Users need the `Azure AI Developer` role on the Microsoft Foundry account. Token audience is always `https://ai.azure.com/.default`.
+Use **keyless** via `DefaultAzureCredential` (EntraID). Users need the `Cognitive Services User` role on the Microsoft Foundry account. Token audience is always `https://ai.azure.com/.default`.
 
 ### Environment variables
 Set from `azd env get-values` after provisioning:
@@ -159,7 +164,7 @@ azd down --purge
 ### Language-specific notes
 - **Python**: Dependencies go in `src/python/requirements.txt`. Only `openai` + `azure-identity`.
 - **TypeScript**: Dependencies go in `src/typescript/package.json`. Only `openai` + `@azure/identity`.
-- **C#**: NuGet packages in `src/csharp/*.csproj`. Use `OpenAI` + `Azure.Identity`. Must add `ApiVersionPolicy` (custom `PipelinePolicy`) for api-version injection. Suppress `OPENAI001` warning for experimental Responses API.
+- **C#**: NuGet packages in `src/csharp/*.csproj`. Use `OpenAI` (≥2.8.0) + `Azure.Identity`. Must add `ApiVersionPolicy` (custom `PipelinePolicy`) for api-version injection. Suppress `OPENAI001` warning for experimental Responses API. Key types: `ResponsesClient` (via `client.GetResponsesClient(model)`), `CreateResponseOptions` (with `InputItems` for input and `MaxOutputTokenCount`), `ResponseResult` (with `GetOutputText()`).
 - **Java**: Maven dependencies in `src/java/pom.xml`. Use `com.openai:openai-java` + `com.azure:azure-identity`. Use `putQueryParam` for api-version. Must manually iterate output items (no `outputText()` convenience).
 - **Go**: Go modules in `src/go/go.mod`. Use `github.com/openai/openai-go` + `github.com/Azure/azure-sdk-for-go/sdk/azidentity`. Use `option.WithQueryAdd` for api-version. Token options from `azcore/policy`, not `azidentity`.
 
