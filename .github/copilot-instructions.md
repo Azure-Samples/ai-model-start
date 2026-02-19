@@ -4,9 +4,9 @@
 
 This is an **Azure Developer CLI (azd) template** that deploys a Microsoft Foundry account with two models (DeepSeek-R1-0528 and gpt-4.1-mini by default) and provides working examples in **Python, TypeScript, C#, Java, and Go** to call them.
 
-- **Infra layer** (`infra/`): Subscription-scoped Bicep. [main.bicep](../infra/main.bicep) creates the resource group and delegates to [foundry.bicep](../infra/foundry.bicep), which provisions `Microsoft.CognitiveServices/accounts` (kind `AIServices`) and a project sub-resource. Model deployments are created by **postprovision hook scripts** (`scripts/deploy-models.ps1` / `scripts/deploy-models.sh`) via Azure CLI, because ARM template validation [rejects non-OpenAI model formats](https://github.com/Azure-Samples/ai-model-start/issues/4).
+- **Infra layer** (`infra/`): Subscription-scoped Bicep. [main.bicep](../infra/main.bicep) creates the resource group and delegates to [foundry.bicep](../infra/foundry.bicep), which provisions `Microsoft.CognitiveServices/accounts` (kind `AIServices`), a project sub-resource, and model deployments (primary + optional secondary).
 - **App layer** (`src/`): One self-contained example per language, each using the **Responses API** with that language's standard **OpenAI SDK** (not Azure-specific SDK wrappers). There is no web app, API server, or deployment target — only local scripts.
-- **Glue**: [azure.yaml](../azure.yaml) wires azd to the Bicep infra and defines postprovision hooks for model deployment. Environment variables flow from Bicep outputs → azd env → hook scripts → app code via `os.environ` (or equivalent).
+- **Glue**: [azure.yaml](../azure.yaml) wires azd to the Bicep infra. Environment variables flow from Bicep outputs → azd env → app code via `os.environ` (or equivalent).
 
 ## Key Conventions
 
@@ -118,7 +118,7 @@ Sample code reads model names from `AZURE_MODEL_DEPLOYMENT_NAME` and `AZURE_MODE
 - Target scope is `subscription` in `main.bicep`; resource-group-scoped resources go in `foundry.bicep` module.
 - API version: `2025-06-01` for all `Microsoft.CognitiveServices` resources.
 - Resource naming uses `uniqueString(subscription().id, environmentName, location)` for uniqueness.
-- **Model deployments are NOT in Bicep** — they are created by postprovision hook scripts via Azure CLI, because ARM validation rejects non-OpenAI model formats.
+- **Model deployments are in Bicep** — defined in `foundry.bicep` as `Microsoft.CognitiveServices/accounts/deployments` resources with `@2025-06-01` API version. Primary deployment is unconditional; secondary uses `if (!empty(model2Name))` conditional.
 - The second model deployment is optional — set `AZURE_MODEL_2_NAME` to empty string to skip it.
 
 ## Developer Workflow

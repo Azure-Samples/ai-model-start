@@ -8,11 +8,29 @@
     "location": {
       "value": "${AZURE_LOCATION}"
     },
+    "modelName": {
+      "value": "${AZURE_MODEL_NAME=DeepSeek-R1-0528}"
+    },
+    "modelFormat": {
+      "value": "${AZURE_MODEL_FORMAT=DeepSeek}"
+    },
+    "modelVersion": {
+      "value": "${AZURE_MODEL_VERSION=1}"
+    },
     "deploymentName": {
-      "value": "${AZURE_MODEL_DEPLOYMENT_NAME=DeepSeek-R1-0528}"
+      "value": "${AZURE_MODEL_DEPLOYMENT_NAME=}"
+    },
+    "model2Name": {
+      "value": "${AZURE_MODEL_2_NAME=gpt-4.1-mini}"
+    },
+    "model2Format": {
+      "value": "${AZURE_MODEL_2_FORMAT=OpenAI}"
+    },
+    "model2Version": {
+      "value": "${AZURE_MODEL_2_VERSION=2025-04-14}"
     },
     "deployment2Name": {
-      "value": "${AZURE_MODEL_2_DEPLOYMENT_NAME=gpt-4.1-mini}"
+      "value": "${AZURE_MODEL_2_DEPLOYMENT_NAME=}"
     }
   }
 }

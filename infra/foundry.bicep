@@ -14,12 +14,43 @@ param location string
 @description('Tags for all resources.')
 param tags object = {}
 
-// ── Model deployment parameters ─────────────
-// NOTE: Model deployments are created via a postprovision hook
-// (scripts/deploy-models.ps1 / deploy-models.sh) because ARM
-// template validation does not yet support non-OpenAI model
-// formats (e.g., DeepSeek, Microsoft, Meta). The CLI bypasses
-// this validation and works for all model formats.
+// ── Primary model deployment parameters ─────
+@description('Name of the primary model to deploy.')
+param modelName string
+
+@description('Format of the primary model (e.g., "DeepSeek", "OpenAI", "Microsoft").')
+param modelFormat string
+
+@description('Version of the primary model.')
+param modelVersion string = ''
+
+@description('Name for the primary deployment.')
+param deploymentName string
+
+@description('SKU name for the primary deployment.')
+param deploymentSkuName string = 'GlobalStandard'
+
+@description('SKU capacity for the primary deployment.')
+param deploymentSkuCapacity int = 10
+
+// ── Secondary model deployment parameters ───
+@description('Name of the secondary model to deploy. Leave empty to skip.')
+param model2Name string = ''
+
+@description('Format of the secondary model.')
+param model2Format string = 'OpenAI'
+
+@description('Version of the secondary model.')
+param model2Version string = ''
+
+@description('Name for the secondary deployment.')
+param deployment2Name string = ''
+
+@description('SKU name for the secondary deployment.')
+param deployment2SkuName string = 'GlobalStandard'
+
+@description('SKU capacity for the secondary deployment.')
+param deployment2SkuCapacity int = 10
 
 // ──────────────────────────────────────────────
 // Microsoft Foundry account
@@ -61,6 +92,52 @@ resource aiProject 'Microsoft.CognitiveServices/accounts/projects@2025-06-01' = 
     type: 'SystemAssigned'
   }
   properties: {}
+}
+
+// ──────────────────────────────────────────────
+// Primary model deployment
+// ──────────────────────────────────────────────
+
+resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = {
+  parent: aiFoundry
+  name: deploymentName
+  sku: {
+    capacity: deploymentSkuCapacity
+    name: deploymentSkuName
+  }
+  properties: {
+    model: {
+      name: modelName
+      format: modelFormat
+      version: !empty(modelVersion) ? modelVersion : null
+    }
+  }
+  dependsOn: [
+    aiProject
+  ]
+}
+
+// ──────────────────────────────────────────────
+// Secondary model deployment (optional)
+// ──────────────────────────────────────────────
+
+resource model2Deployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = if (!empty(model2Name)) {
+  parent: aiFoundry
+  name: !empty(deployment2Name) ? deployment2Name : model2Name
+  sku: {
+    capacity: deployment2SkuCapacity
+    name: deployment2SkuName
+  }
+  properties: {
+    model: {
+      name: model2Name
+      format: model2Format
+      version: !empty(model2Version) ? model2Version : null
+    }
+  }
+  dependsOn: [
+    modelDeployment
+  ]
 }
 
 // ──────────────────────────────────────────────

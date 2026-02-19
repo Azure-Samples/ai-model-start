@@ -182,14 +182,12 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and pa
 ## Template Structure
 
 ```
-├── azure.yaml                 # azd configuration (includes postprovision hooks)
+├── azure.yaml                 # azd configuration
 ├── infra/
 │   ├── main.bicep             # Main deployment template (subscription-scoped)
 │   ├── main.parameters.json   # Deployment parameters
-│   └── foundry.bicep          # Microsoft Foundry account and project
+│   └── foundry.bicep          # Microsoft Foundry account, project, and model deployments
 ├── scripts/
-│   ├── deploy-models.ps1      # Postprovision: deploy models via CLI (Windows)
-│   ├── deploy-models.sh       # Postprovision: deploy models via CLI (Linux/macOS)
 │   ├── list_models_with_responses_api_support.py  # Utility: list models supporting the Responses API
 │   └── requirements.txt       # Dependencies for scripts (control plane)
 ├── src/
@@ -224,7 +222,7 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and pa
 
 ## Configuration
 
-Model deployments are created by postprovision hook scripts (`scripts/deploy-models.ps1` / `scripts/deploy-models.sh`), which run automatically after `azd up` provisions the Foundry account. Configure models via `azd env set` before running `azd up`:
+Model deployments are defined in Bicep and created automatically during `azd up`. Configure models via `azd env set` before running `azd up`:
 
 | Variable | Default | Description |
 |---|---|---|
@@ -338,7 +336,7 @@ python list_models_with_responses_api_support.py --non-openai --locations
 
 | Issue | Summary | Workaround |
 |---|---|---|
-| [ARM validation rejects non-OpenAI models](https://github.com/Azure-Samples/ai-model-start/issues/4) | Bicep/ARM template deployment fails for non-OpenAI model formats (DeepSeek, Meta, Microsoft) with `DeploymentModelNotSupported`. | This template uses **postprovision hook scripts** that deploy models via Azure CLI, bypassing ARM validation. No action needed. |
+| ~~[ARM validation rejects non-OpenAI models](https://github.com/Azure-Samples/ai-model-start/issues/4)~~ | ~~Bicep/ARM template deployment previously failed for non-OpenAI model formats.~~ | **Resolved** — Model deployments now work natively in Bicep with API version `2025-06-01`. |
 | [Java SDK `putQueryParam` bug](https://github.com/Azure-Samples/ai-model-start/issues/3) | `openai-java` v4.21.0 `putQueryParam("api-version", ...)` silently drops the query parameter, causing `400: API version not supported` errors with EntraID auth. | Wait for an SDK fix. The Java example is included for reference but may not work until this is resolved. |
 | [API key endpoint limitation](https://github.com/Azure-Samples/ai-model-start/issues/5) | The account-level API key endpoint (`/openai/v1`) does not support the Responses API for non-OpenAI models. | This template uses **EntraID authentication** with the project endpoint, which supports all models. |
 
@@ -346,7 +344,7 @@ python list_models_with_responses_api_support.py --non-openai --locations
 
 **401 / 403 "Permission denied"** — You need the `Azure AI Developer` role on the Foundry account. Run the role assignment command from [Set up your environment](#set-up-your-environment). Role assignments can take up to 5 minutes to propagate.
 
-**"DeploymentModelNotSupported" during `azd up`** — This shouldn't happen with the default configuration (models are deployed via CLI hooks, not Bicep). If you see this, ensure you're using the latest version of this template.
+**"DeploymentModelNotSupported" during `azd up`** — Ensure the model format matches the model name (e.g., `DeepSeek` format for DeepSeek models, `OpenAI` for GPT models). Check available models with `az cognitiveservices model list -l <location> --query "[?model.format=='YourFormat']"`. See `scripts/list_models_with_responses_api_support.py` for discovery.
 
 **"Quota exceeded"** — Check your subscription's quota for the selected model in the target region. Try a different region or model.
 
