@@ -9,10 +9,28 @@ targetScope = 'subscription'
 @description('Name of the azd environment, used for resource naming.')
 param environmentName string
 
-@description('Primary location for all resources. Restricted to the two regions with the broadest Foundry model availability (37/38 Responses API models).')
+@description('Primary location for all resources. Restricted to regions with GlobalStandard SKU support for the broadest model availability.')
 @allowed([
+  'australiaeast'
+  'canadacentral'
+  'canadaeast'
+  'eastus'
   'eastus2'
+  'francecentral'
+  'germanywestcentral'
+  'japaneast'
+  'koreacentral'
+  'northcentralus'
+  'norwayeast'
+  'polandcentral'
+  'southafricanorth'
+  'southcentralus'
   'swedencentral'
+  'switzerlandnorth'
+  'uksouth'
+  'westeurope'
+  'westus'
+  'westus3'
 ])
 param location string
 
