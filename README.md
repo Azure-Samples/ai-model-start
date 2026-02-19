@@ -65,9 +65,23 @@ That's it! You now have a Microsoft Foundry account with both models deployed an
 
 ### Set up your environment
 
+After `azd up`, a `.env` file is automatically created in the project root with all required environment variables. Source it before running examples:
+
+**Bash / macOS / Linux**
+```bash
+# 1. Load environment variables
+source .env
+
+# 2. Assign yourself the Azure AI Developer role
+userId=$(az ad signed-in-user show --query id -o tsv)
+resourceId="/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-$(azd env get-value 'AZURE_ENV_NAME')/providers/Microsoft.CognitiveServices/accounts/$(azd env get-value 'AZURE_AI_FOUNDRY_NAME')"
+az role assignment create --role "Azure AI Developer" --assignee $userId --scope $resourceId
+```
+
+**PowerShell / Windows**
 ```powershell
-# 1. Set the project endpoint environment variable
-$env:AZURE_AI_PROJECT_ENDPOINT = azd env get-value 'AZURE_AI_PROJECT_ENDPOINT'
+# 1. Load environment variables
+Get-Content .env | ForEach-Object { if ($_ -match '^([^#=]+)=(.*)$') { [Environment]::SetEnvironmentVariable($matches[1], $matches[2]) } }
 
 # 2. Assign yourself the Azure AI Developer role
 $userId = az ad signed-in-user show --query id -o tsv

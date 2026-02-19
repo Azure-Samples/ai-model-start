@@ -28,6 +28,9 @@ target/
 go.sum
 *.exe
 
+# Environment
+.env
+
 # OS
 .DS_Store
 Thumbs.db
