@@ -69,8 +69,8 @@ After `azd up`, a `.env` file is automatically created in the project root with 
 
 **Bash / macOS / Linux**
 ```bash
-# 1. Load environment variables
-source .env
+# 1. Load environment variables (set -a auto-exports for child processes)
+set -a; source .env; set +a
 
 # 2. Assign yourself the Azure AI Developer role
 userId=$(az ad signed-in-user show --query id -o tsv)
@@ -136,6 +136,10 @@ All five examples follow the same pattern:
 3. **Pass `api-version`** as a query parameter (`2025-11-15-preview`)
 4. **Call the Responses API** — works with any deployed model
 
+**Why the standard OpenAI SDK?**
+
+The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and passing the `api-version` as a query parameter, you can use the standard `openai` library in any language — no `azure-ai-projects`, `AzureOpenAI`, or `Azure.AI.OpenAI` wrapper needed. This works for all model providers (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more).
+
 ### Python code sample
 
 ```python
@@ -161,19 +165,6 @@ response = client.responses.create(
 )
 print(response.output_text)
 ```
-
-### The pattern (every language)
-
-All five examples follow the same pattern:
-
-1. **Get an EntraID token** via `DefaultAzureCredential` (scoped to `https://ai.azure.com/.default`)
-2. **Create a standard OpenAI client** with `base_url` = project endpoint + `/openai`
-3. **Pass `api-version`** as a query parameter (`2025-11-15-preview`)
-4. **Call the Responses API** — works with any deployed model
-
-**Why the standard OpenAI SDK?**
-
-The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and passing the `api-version` as a query parameter, you can use the standard `openai` library in any language — no `azure-ai-projects`, `AzureOpenAI`, or `Azure.AI.OpenAI` wrapper needed. This works for all model providers (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more).
 
 ## What This Template Includes
 
