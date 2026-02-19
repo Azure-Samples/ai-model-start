@@ -9,6 +9,7 @@ import os
 import sys
 
 from azure.identity import DefaultAzureCredential
+from dotenv import load_dotenv
 from openai import OpenAI
 
 
@@ -21,6 +22,7 @@ def get_token():
 
 def main():
     """Run Responses API examples using the plain OpenAI SDK."""
+    load_dotenv(override=True)
     print("Microsoft Foundry Models - Responses API (Plain OpenAI SDK)\n")
 
     endpoint = os.environ.get("AZURE_AI_PROJECT_ENDPOINT")
