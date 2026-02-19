@@ -9,7 +9,29 @@ targetScope = 'subscription'
 @description('Name of the azd environment, used for resource naming.')
 param environmentName string
 
-@description('Primary location for all resources.')
+@description('Primary location for all resources. Restricted to regions where both default models (DeepSeek-R1-0528 and gpt-4.1-mini) are available.')
+@allowed([
+  'australiaeast'
+  'canadacentral'
+  'canadaeast'
+  'eastus'
+  'eastus2'
+  'francecentral'
+  'germanywestcentral'
+  'japaneast'
+  'koreacentral'
+  'northcentralus'
+  'norwayeast'
+  'polandcentral'
+  'southafricanorth'
+  'southcentralus'
+  'swedencentral'
+  'switzerlandnorth'
+  'uksouth'
+  'westeurope'
+  'westus'
+  'westus3'
+])
 param location string
 
 @description('Name of the Microsoft Foundry account. Defaults to a generated name.')
