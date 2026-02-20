@@ -1,9 +1,8 @@
 // Microsoft Foundry Models - Responses API Example (Plain OpenAI SDK)
-// Uses the standard OpenAI NuGet package with the project endpoint + /openai suffix.
-// No dependency on Azure.AI.OpenAI.
+// Uses the standard OpenAI NuGet package with the project endpoint + /openai/v1 suffix.
+// No api-version query parameter needed. No dependency on Azure.AI.OpenAI.
 
 using System.ClientModel;
-using System.ClientModel.Primitives;
 using Azure.Identity;
 using OpenAI;
 using OpenAI.Responses;
@@ -23,12 +22,11 @@ var token = await credential.GetTokenAsync(
     new Azure.Core.TokenRequestContext(["https://ai.azure.com/.default"])
 );
 
-// Standard OpenAI client — no AzureOpenAI wrapper
-// Add api-version query parameter via a custom pipeline policy
-var baseUrl = endpoint.TrimEnd('/') + "/openai";
-var options = new OpenAIClientOptions { Endpoint = new Uri(baseUrl) };
-options.AddPolicy(new ApiVersionPolicy("2025-11-15-preview"), PipelinePosition.BeforeTransport);
-var client = new OpenAIClient(new ApiKeyCredential(token.Token), options);
+// Standard OpenAI client — no AzureOpenAI wrapper (no api-version needed with /v1 path)
+var baseUrl = endpoint.TrimEnd('/') + "/openai/v1";
+var client = new OpenAIClient(
+    new ApiKeyCredential(token.Token),
+    new OpenAIClientOptions { Endpoint = new Uri(baseUrl) });
 
 // --- Example 1: OpenAI model (gpt-4.1-mini) ---
 var openaiModel = Environment.GetEnvironmentVariable("AZURE_MODEL_2_DEPLOYMENT_NAME") ?? "gpt-4.1-mini";
@@ -57,28 +55,3 @@ Console.WriteLine($"Status:   {result2.Value.Status}");
 Console.WriteLine($"Output tokens: {result2.Value.Usage.OutputTokenCount}");
 
 return 0;
-
-/// <summary>
-/// Pipeline policy that appends api-version query parameter to every request.
-/// </summary>
-class ApiVersionPolicy(string apiVersion) : PipelinePolicy
-{
-    public override void Process(PipelineMessage message, IReadOnlyList<PipelinePolicy> pipeline, int currentIndex)
-    {
-        AddApiVersion(message);
-        ProcessNext(message, pipeline, currentIndex);
-    }
-
-    public override async ValueTask ProcessAsync(PipelineMessage message, IReadOnlyList<PipelinePolicy> pipeline, int currentIndex)
-    {
-        AddApiVersion(message);
-        await ProcessNextAsync(message, pipeline, currentIndex);
-    }
-
-    private void AddApiVersion(PipelineMessage message)
-    {
-        var uri = message.Request.Uri!;
-        var separator = uri.Query.Contains('?') ? "&" : "?";
-        message.Request.Uri = new Uri($"{uri}{separator}api-version={apiVersion}");
-    }
-}

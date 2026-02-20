@@ -1,6 +1,6 @@
 // Microsoft Foundry Models - Responses API Example (Plain OpenAI SDK)
-// Uses the standard openai-go package with the project endpoint + /openai suffix.
-// No dependency on Azure AI SDKs for model invocation.
+// Uses the standard openai-go package with the project endpoint + /openai/v1 suffix.
+// No api-version query parameter needed. No dependency on Azure AI SDKs for model invocation.
 package main
 
 import (
@@ -41,12 +41,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Standard OpenAI client — no Azure wrapper
-	baseURL := strings.TrimRight(endpoint, "/") + "/openai"
+	// Standard OpenAI client — no Azure wrapper (no api-version needed with /v1 path)
+	baseURL := strings.TrimRight(endpoint, "/") + "/openai/v1"
 	client := openai.NewClient(
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey(token.Token),
-		option.WithQueryAdd("api-version", "2025-11-15-preview"),
 	)
 
 	// --- Example 1: OpenAI model (gpt-4.1-mini) ---

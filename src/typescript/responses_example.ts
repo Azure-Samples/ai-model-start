@@ -1,7 +1,7 @@
 /**
  * Microsoft Foundry Models - Responses API Example (Plain OpenAI SDK)
- * Uses the standard openai package with the project endpoint + /openai suffix.
- * No dependency on @azure/openai.
+ * Uses the standard openai package with the project endpoint + /openai/v1 suffix.
+ * No api-version query parameter needed. No dependency on @azure/openai.
  */
 
 import OpenAI from "openai";
@@ -26,13 +26,12 @@ async function main() {
     process.exit(1);
   }
 
-  const baseURL = endpoint.replace(/\/+$/, "") + "/openai";
+  const baseURL = endpoint.replace(/\/+$/, "") + "/openai/v1";
   const token = await getToken();
 
   const client = new OpenAI({
     baseURL,
     apiKey: token,
-    defaultQuery: { "api-version": "2025-11-15-preview" },
   });
 
   // --- Example 1: OpenAI model (gpt-4.1-mini) ---

@@ -120,13 +120,12 @@ go run .
 All five examples follow the same pattern:
 
 1. **Get an EntraID token** via `DefaultAzureCredential` (scoped to `https://ai.azure.com/.default`)
-2. **Create a standard OpenAI client** with `base_url` = project endpoint + `/openai`
-3. **Pass `api-version`** as a query parameter (`2025-11-15-preview`)
-4. **Call the Responses API** — works with any deployed model
+2. **Create a standard OpenAI client** with `base_url` = project endpoint + `/openai/v1`
+3. **Call the Responses API** — works with any deployed model
 
 **Why the standard OpenAI SDK?**
 
-The Foundry endpoint is OpenAI-compatible. By appending `/openai` and passing the `api-version` as a query parameter, you can use the standard `openai` library in any language — no `azure-ai-projects`, `AzureOpenAI`, or `Azure.AI.OpenAI` wrapper needed. This works for all model providers (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more).
+The Foundry endpoint is OpenAI-compatible. By appending `/openai/v1`, you can use the standard `openai` library in any language — no `azure-ai-projects`, `AzureOpenAI`, or `Azure.AI.OpenAI` wrapper needed. No `api-version` query parameter is required. This works for all model providers (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more).
 
 ### Python code sample
 
@@ -138,9 +137,8 @@ from openai import OpenAI
 credential = DefaultAzureCredential()
 endpoint = os.environ["AZURE_AI_PROJECT_ENDPOINT"]
 client = OpenAI(
-    base_url=endpoint.rstrip("/") + "/openai",
+    base_url=endpoint.rstrip("/") + "/openai/v1",
     api_key=get_bearer_token_provider(credential, "https://ai.azure.com/.default"),
-    default_query={"api-version": "2025-11-15-preview"},
 )
 
 # Works with any Foundry model — OpenAI, DeepSeek, etc.
@@ -270,7 +268,7 @@ After `azd up`, available via `azd env get-values`:
 | `AZURE_RESOURCE_GROUP` | Resource group name |
 | `AZURE_AI_FOUNDRY_NAME` | Microsoft Foundry account name |
 | `AZURE_AI_PROJECT_NAME` | Foundry project name |
-| `AZURE_AI_PROJECT_ENDPOINT` | Project endpoint URL (use as `base_url` with `/openai` suffix) |
+| `AZURE_AI_PROJECT_ENDPOINT` | Project endpoint URL (use as `base_url` with `/openai/v1` suffix) |
 | `AZURE_MODEL_DEPLOYMENT_NAME` | Primary model deployment name |
 | `AZURE_MODEL_2_DEPLOYMENT_NAME` | Second model deployment name |
 
@@ -328,7 +326,7 @@ python list_models_with_responses_api_support.py --non-openai --locations
 | Issue | Summary | Workaround |
 |---|---|---|
 | ~~[ARM validation rejects non-OpenAI models](https://github.com/Azure-Samples/ai-model-start/issues/4)~~ | ~~Bicep/ARM template deployment previously failed for non-OpenAI model formats.~~ | **Resolved** — Model deployments now work natively in Bicep with API version `2025-06-01`. |
-| [Java SDK `putQueryParam` bug](https://github.com/Azure-Samples/ai-model-start/issues/3) | `openai-java` `putQueryParam("api-version", ...)` silently drops the query parameter, causing `400: API version not supported` errors with EntraID auth. Confirmed on v4.21.0 and v4.22.0. | Wait for an SDK fix. The Java example is included for reference but may not work until this is resolved. |
+| [Java SDK `putQueryParam` bug](https://github.com/Azure-Samples/ai-model-start/issues/3) | `openai-java` `putQueryParam("api-version", ...)` silently drops the query parameter, causing `400: API version not supported` errors with EntraID auth. Confirmed on v4.21.0 and v4.22.0. | Use `/openai/v1` base URL instead (no `api-version` needed). All examples now use this approach. |
 | [API key endpoint limitation](https://github.com/Azure-Samples/ai-model-start/issues/5) | The account-level API key endpoint (`/openai/v1`) does not support the Responses API for non-OpenAI models. | This template uses **EntraID authentication** with the project endpoint, which supports all models. |
 
 ## Troubleshooting
@@ -346,11 +344,11 @@ az role assignment create --role "Cognitive Services User" \
 
 **429 Rate limited** — Increase `AZURE_MODEL_SKU_CAPACITY` or try a different model with more available capacity.
 
-**"api-version is required"** / **"Missing required query string parameter 'api-version'"** — You're using the `/openai` path without passing `api-version`. Add `api-version=2025-11-15-preview` as a query parameter. All examples show how to do this.
+**"api-version is required"** / **"Missing required query string parameter 'api-version'"** — You're using the `/openai` path without passing `api-version`. Switch to `/openai/v1` instead, which doesn't require an `api-version` parameter. All examples use this approach.
 
-**"UnsupportedApiVersion"** — The SDK is sending its default api-version (which isn't supported). Set `api-version=2025-11-15-preview` as a query parameter explicitly.
+**"UnsupportedApiVersion"** — The SDK or your code is sending an api-version that isn't supported. Switch to `/openai/v1` which doesn't require an `api-version` parameter.
 
-**Java `400: API version not supported`** — This is a [known SDK bug](https://github.com/Azure-Samples/ai-model-start/issues/3). The Java OpenAI SDK's `putQueryParam` doesn't correctly append the api-version. Confirmed on v4.21.0 and v4.22.0. Wait for an SDK fix.
+**Java `400: API version not supported`** — This is a [known SDK bug](https://github.com/Azure-Samples/ai-model-start/issues/3) where `putQueryParam` doesn't work correctly. All examples (including Java) now use `/openai/v1` which avoids this issue entirely.
 
 **"FlagMustBeSetForRestore" during `azd up`** — A previously deleted Foundry account with the same name still exists in soft-deleted state. Purge it first:
 ```bash
