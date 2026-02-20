@@ -2,7 +2,7 @@
 
 The fastest way to get started with building apps using **any AI model**.
 
-Call **any Foundry models** — GPT, DeepSeek, Grok, Llama, and more — using **stable OpenAI SDKs** and the **OpenAI Responses API**. Production grade, enterprise friendly and secure with **EntraID keyless authentication** — no API keys, and zero secrets to manage.
+Call **any Foundry models** — GPT, DeepSeek, Grok, Llama, and more — using **stable OpenAI SDKs** and the **GA OpenAI Responses API**. Production grade, enterprise friendly and secure with **EntraID keyless authentication** — no API keys, and zero secrets to manage.
 
 Includes working examples in **Python, TypeScript, C#, Java, and Go**.
 
@@ -12,7 +12,7 @@ block-beta
     sdkTitle["OpenAI SDKs (Stable)"]:5
     py["🐍 Python"] ts["📘 TypeScript"] cs["🟪 C#"] java["☕ Java"] go["🩵 Go"]
     space:5
-    space:1 arrow["⚡ OpenAI Responses API"]:3 space:1
+    space:1 arrow["⚡ GA OpenAI Responses API"]:3 space:1
     space:1 auth["🔐 EntraID Keyless Auth · Zero Secrets"]:3 space:1
     space:5
     foundryTitle["Microsoft Foundry Models"]:5
@@ -164,7 +164,7 @@ print(response.output_text)
 - **Flexible model deployment** — Deploy any Foundry model (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more)
 - **Microsoft Foundry project** — Full project workspace for your development team
 - **Standard OpenAI SDKs** — Use each language's `openai` library directly, no Azure-specific wrappers
-- **Responses API support** — Modern API, cleaner than Chat Completions
+- **GA Responses API** — Production-ready API, cleaner than Chat Completions
 - **Keyless authentication** — Secure EntraID auth, no API keys to manage
 - **Unique resource naming** — No conflicts with existing resources
 
@@ -326,7 +326,8 @@ python list_models_with_responses_api_support.py --non-openai --locations
 | Issue | Summary | Workaround |
 |---|---|---|
 | ~~[ARM validation rejects non-OpenAI models](https://github.com/Azure-Samples/ai-model-start/issues/4)~~ | ~~Bicep/ARM template deployment previously failed for non-OpenAI model formats.~~ | **Resolved** — Model deployments now work natively in Bicep with API version `2025-06-01`. |
-| [Java SDK `putQueryParam` bug](https://github.com/Azure-Samples/ai-model-start/issues/3) | `openai-java` `putQueryParam("api-version", ...)` silently drops the query parameter, causing `400: API version not supported` errors with EntraID auth. Confirmed on v4.21.0 and v4.22.0. | Use `/openai/v1` base URL instead (no `api-version` needed). All examples now use this approach. |
+| ~~[Preview API version required](https://github.com/Azure-Samples/ai-model-start/issues/2)~~ | ~~`/openai/v1` endpoint previously only accepted `api-version=2025-11-15-preview`.~~ | **Resolved** — The `/openai/v1` path is now GA and doesn't require an `api-version` parameter at all. |
+| ~~[Java SDK `putQueryParam` bug](https://github.com/Azure-Samples/ai-model-start/issues/3)~~ | ~~`openai-java` `putQueryParam("api-version", ...)` silently drops the query parameter, causing `400: API version not supported` errors with EntraID auth.~~ | **Resolved** — All examples now use `/openai/v1` base URL which doesn't need `api-version`. |
 | [API key endpoint limitation](https://github.com/Azure-Samples/ai-model-start/issues/5) | The account-level API key endpoint (`/openai/v1`) does not support the Responses API for non-OpenAI models. | This template uses **EntraID authentication** with the project endpoint, which supports all models. |
 
 ## Troubleshooting
@@ -363,7 +364,7 @@ Need debug info? Run `azd up --debug` for detailed logs.
 - **Minimal setup** — 2 commands instead of 20+
 - **Any Foundry model** — Access OpenAI, DeepSeek, Meta, xAI, Microsoft, and more
 - **Any language** — Python, TypeScript, C#, Java, and Go examples included
-- **Modern API** — Uses the Responses API, not legacy Chat Completions
+- **GA Responses API** — Uses the production-ready Responses API, not legacy Chat Completions
 - **Standard SDKs** — Uses each language's OpenAI SDK directly, no Azure-specific wrappers
 - **Production-ready** — GlobalStandard SKU, EntraID auth, proper naming
 - **Secure by default** — Keyless EntraID authentication with Azure Identity
