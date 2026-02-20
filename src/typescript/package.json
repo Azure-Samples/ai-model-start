@@ -8,10 +8,10 @@
   },
   "dependencies": {
     "@azure/identity": "^4.0.0",
-    "openai": "^4.80.0"
+    "openai": "^6.22.0"
   },
   "devDependencies": {
-    "tsx": "^4.0.0",
-    "@types/node": "^22.0.0"
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0"
   }
 }
