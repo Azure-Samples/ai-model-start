@@ -78,14 +78,15 @@ Console.WriteLine(response.Value.GetOutputText());
 
 ### Java SDK pattern
 
+The Java OpenAI SDK sends its own internal API version header, which conflicts with the `api-version` query parameter on the `/openai` path. Use `/openai/v1` instead — no `api-version` query parameter is needed.
+
 ```java
 DefaultAzureCredential credential = new DefaultAzureCredentialBuilder().build();
 AccessToken token = credential.getTokenSync(new TokenRequestContext().addScopes("https://ai.azure.com/.default"));
 
 OpenAIClient client = OpenAIOkHttpClient.builder()
-    .baseUrl(endpoint.replaceAll("/+$", "") + "/openai")
+    .baseUrl(endpoint.replaceAll("/+$", "") + "/openai/v1")
     .apiKey(token.getToken())
-    .putQueryParam("api-version", "2025-11-15-preview")
     .build();
 ```
 
@@ -163,7 +164,7 @@ azd down --purge
 - **Python**: Dependencies go in `src/python/requirements.txt`. Only `openai` + `azure-identity`.
 - **TypeScript**: Dependencies go in `src/typescript/package.json`. Only `openai` + `@azure/identity`.
 - **C#**: NuGet packages in `src/csharp/*.csproj`. Use `OpenAI` (≥2.8.0) + `Azure.Identity`. Must add `ApiVersionPolicy` (custom `PipelinePolicy`) for api-version injection. Suppress `OPENAI001` warning for experimental Responses API. Key types: `ResponsesClient` (via `client.GetResponsesClient(model)`), `CreateResponseOptions` (with `InputItems` for input and `MaxOutputTokenCount`), `ResponseResult` (with `GetOutputText()`).
-- **Java**: Maven dependencies in `src/java/pom.xml`. Use `com.openai:openai-java` + `com.azure:azure-identity`. Use `putQueryParam` for api-version. Must manually iterate output items (no `outputText()` convenience).
+- **Java**: Maven dependencies in `src/java/pom.xml`. Use `com.openai:openai-java` + `com.azure:azure-identity`. Use `/openai/v1` base URL (no `api-version` needed — the SDK manages versioning internally). Must manually iterate output items (no `outputText()` convenience).
 - **Go**: Go modules in `src/go/go.mod`. Use `github.com/openai/openai-go` + `github.com/Azure/azure-sdk-for-go/sdk/azidentity`. Use `option.WithQueryAdd` for api-version. Token options from `azcore/policy`, not `azidentity`.
 
 ## When Modifying Infrastructure

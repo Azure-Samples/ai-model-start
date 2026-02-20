@@ -1,6 +1,8 @@
 /**
  * Microsoft Foundry Models - Responses API Example (Plain OpenAI SDK)
- * Uses the standard OpenAI Java SDK with the project endpoint + /openai suffix.
+ * Uses the standard OpenAI Java SDK with the project endpoint + /openai/v1 suffix.
+ * The Java SDK sends its own internal API version header, so we use the /v1 path
+ * (which does not require an api-version query parameter) instead of /openai.
  * No dependency on Azure AI SDKs for model invocation.
  */
 
@@ -37,11 +39,11 @@ public class ResponsesExample {
         String token = credential.getToken(context).block().getToken();
 
         // Standard OpenAI client — no Azure wrapper
-        String baseUrl = endpoint.replaceAll("/+$", "") + "/openai";
+        // Java SDK uses /openai/v1 path (no api-version needed; SDK manages versioning internally)
+        String baseUrl = endpoint.replaceAll("/+$", "") + "/openai/v1";
         OpenAIClient client = OpenAIOkHttpClient.builder()
                 .baseUrl(baseUrl)
                 .apiKey(token)
-                .putQueryParam("api-version", "2025-11-15-preview")
                 .build();
 
         // --- Example 1: OpenAI model (gpt-4.1-mini) ---
