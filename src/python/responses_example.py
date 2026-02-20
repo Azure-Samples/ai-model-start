@@ -8,16 +8,9 @@ No dependency on azure.ai.projects.
 import os
 import sys
 
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from dotenv import load_dotenv
 from openai import OpenAI
-
-
-def get_token():
-    """Get an EntraID access token for the Microsoft Foundry project endpoint."""
-    credential = DefaultAzureCredential()
-    token = credential.get_token("https://ai.azure.com/.default")
-    return token.token
 
 
 def main():
@@ -32,12 +25,12 @@ def main():
 
     # Build the base URL: project endpoint + /openai
     base_url = endpoint.rstrip("/") + "/openai"
-    token = get_token()
 
-    # Standard OpenAI client — no AzureOpenAI, no AIProjectClient
+    # Use get_bearer_token_provider for automatic token refresh
+    credential = DefaultAzureCredential()
     client = OpenAI(
         base_url=base_url,
-        api_key=token,
+        api_key=get_bearer_token_provider(credential, "https://ai.azure.com/.default"),
         default_query={"api-version": "2025-11-15-preview"},
     )
 

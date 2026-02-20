@@ -132,16 +132,14 @@ The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and pa
 
 ```python
 import os
-from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from openai import OpenAI
 
 credential = DefaultAzureCredential()
-token = credential.get_token("https://ai.azure.com/.default").token
-
 endpoint = os.environ["AZURE_AI_PROJECT_ENDPOINT"]
 client = OpenAI(
     base_url=endpoint.rstrip("/") + "/openai",
-    api_key=token,
+    api_key=get_bearer_token_provider(credential, "https://ai.azure.com/.default"),
     default_query={"api-version": "2025-11-15-preview"},
 )
 
