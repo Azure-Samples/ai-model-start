@@ -65,31 +65,19 @@ That's it! You now have a Microsoft Foundry account with both models deployed an
 
 ### Set up your environment
 
-After `azd up`, a `.env` file is automatically created in the project root with all required environment variables. Source it before running examples:
+After `azd up`, a `.env` file is automatically created in the project root with all required environment variables. The `Cognitive Services User` role is also automatically assigned to the deploying user during provisioning. Source the `.env` file before running examples:
 
 **Bash / macOS / Linux**
 ```bash
-# 1. Load environment variables (set -a auto-exports for child processes)
 set -a; source .env; set +a
-
-# 2. Assign yourself the Cognitive Services User role
-userId=$(az ad signed-in-user show --query id -o tsv)
-resourceId="/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-$(azd env get-value 'AZURE_ENV_NAME')/providers/Microsoft.CognitiveServices/accounts/$(azd env get-value 'AZURE_AI_FOUNDRY_NAME')"
-az role assignment create --role "Cognitive Services User" --assignee $userId --scope $resourceId
 ```
 
 **PowerShell / Windows**
 ```powershell
-# 1. Load environment variables
 Get-Content .env | ForEach-Object { if ($_ -match '^([^#=]+)=(.*)$') { [Environment]::SetEnvironmentVariable($matches[1], $matches[2]) } }
-
-# 2. Assign yourself the Cognitive Services User role
-$userId = az ad signed-in-user show --query id -o tsv
-$resourceId = "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/rg-$(azd env get-value 'AZURE_ENV_NAME')/providers/Microsoft.CognitiveServices/accounts/$(azd env get-value 'AZURE_AI_FOUNDRY_NAME')"
-az role assignment create --role "Cognitive Services User" --assignee $userId --scope $resourceId
 ```
 
-> **Note:** Role assignments can take up to 5 minutes to propagate. If you see 401/403 errors, wait a few minutes and retry.
+> **Note:** Role assignments can take up to 5 minutes to propagate. If you see 401/403 errors right after `azd up`, wait a few minutes and retry.
 
 ### Run an example
 
@@ -342,12 +330,17 @@ python list_models_with_responses_api_support.py --non-openai --locations
 | Issue | Summary | Workaround |
 |---|---|---|
 | ~~[ARM validation rejects non-OpenAI models](https://github.com/Azure-Samples/ai-model-start/issues/4)~~ | ~~Bicep/ARM template deployment previously failed for non-OpenAI model formats.~~ | **Resolved** — Model deployments now work natively in Bicep with API version `2025-06-01`. |
-| [Java SDK `putQueryParam` bug](https://github.com/Azure-Samples/ai-model-start/issues/3) | `openai-java` v4.21.0 `putQueryParam("api-version", ...)` silently drops the query parameter, causing `400: API version not supported` errors with EntraID auth. | Wait for an SDK fix. The Java example is included for reference but may not work until this is resolved. |
+| [Java SDK `putQueryParam` bug](https://github.com/Azure-Samples/ai-model-start/issues/3) | `openai-java` `putQueryParam("api-version", ...)` silently drops the query parameter, causing `400: API version not supported` errors with EntraID auth. Confirmed on v4.21.0 and v4.22.0. | Wait for an SDK fix. The Java example is included for reference but may not work until this is resolved. |
 | [API key endpoint limitation](https://github.com/Azure-Samples/ai-model-start/issues/5) | The account-level API key endpoint (`/openai/v1`) does not support the Responses API for non-OpenAI models. | This template uses **EntraID authentication** with the project endpoint, which supports all models. |
 
 ## Troubleshooting
 
-**401 / 403 "Permission denied"** — You need the `Cognitive Services User` role on the Foundry account. Run the role assignment command from [Set up your environment](#set-up-your-environment). Role assignments can take up to 5 minutes to propagate.
+**401 / 403 "Permission denied"** — The `Cognitive Services User` role is assigned automatically during `azd up`. If you still see this error, role assignments can take up to 5 minutes to propagate — wait and retry. If another user needs access, assign the role manually:
+```bash
+az role assignment create --role "Cognitive Services User" \
+  --assignee <user-object-id> \
+  --scope "/subscriptions/<sub-id>/resourceGroups/<rg-name>/providers/Microsoft.CognitiveServices/accounts/<foundry-name>"
+```
 
 **"DeploymentModelNotSupported" during `azd up`** — Ensure the model format matches the model name (e.g., `DeepSeek` format for DeepSeek models, `OpenAI` for GPT models). Check available models with `az cognitiveservices model list -l <location> --query "[?model.format=='YourFormat']"`. See `scripts/list_models_with_responses_api_support.py` for discovery.
 
@@ -359,7 +352,13 @@ python list_models_with_responses_api_support.py --non-openai --locations
 
 **"UnsupportedApiVersion"** — The SDK is sending its default api-version (which isn't supported). Set `api-version=2025-11-15-preview` as a query parameter explicitly.
 
-**Java `400: API version not supported`** — This is a [known SDK bug](https://github.com/Azure-Samples/ai-model-start/issues/3). The Java OpenAI SDK's `putQueryParam` doesn't correctly append the api-version. Wait for an SDK fix.
+**Java `400: API version not supported`** — This is a [known SDK bug](https://github.com/Azure-Samples/ai-model-start/issues/3). The Java OpenAI SDK's `putQueryParam` doesn't correctly append the api-version. Confirmed on v4.21.0 and v4.22.0. Wait for an SDK fix.
+
+**"FlagMustBeSetForRestore" during `azd up`** — A previously deleted Foundry account with the same name still exists in soft-deleted state. Purge it first:
+```bash
+az cognitiveservices account purge --location <location> --resource-group <rg-name> --name <foundry-name>
+```
+To avoid this, always use `azd down --purge` instead of `azd down` when tearing down resources.
 
 Need debug info? Run `azd up --debug` for detailed logs.
 

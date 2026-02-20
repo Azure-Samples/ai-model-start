@@ -83,6 +83,11 @@ param deployment2SkuName string = 'GlobalStandard'
 @description('SKU capacity for the secondary deployment.')
 param deployment2SkuCapacity int = 10
 
+// ── Identity / RBAC ──────────────────────────
+
+@description('Principal ID of the deploying user. azd populates this automatically.')
+param principalId string = ''
+
 // ── Tags ─────────────────────────────────────
 
 param tags object = {}
@@ -132,6 +137,7 @@ module foundry 'foundry.bicep' = {
     deployment2Name: effectiveDeployment2Name
     deployment2SkuName: deployment2SkuName
     deployment2SkuCapacity: deployment2SkuCapacity
+    principalId: principalId
   }
 }
 

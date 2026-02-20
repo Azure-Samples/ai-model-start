@@ -31,6 +31,9 @@
     },
     "deployment2Name": {
       "value": "${AZURE_MODEL_2_DEPLOYMENT_NAME=}"
+    },
+    "principalId": {
+      "value": "${AZURE_PRINCIPAL_ID}"
     }
   }
 }

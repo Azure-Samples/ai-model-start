@@ -75,6 +75,7 @@ resource aiFoundry 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
     // Defines developer API endpoint subdomain
     customSubDomainName: aiFoundryName
     disableLocalAuth: false
+    publicNetworkAccess: 'Enabled'
   }
 }
 
@@ -138,6 +139,24 @@ resource model2Deployment 'Microsoft.CognitiveServices/accounts/deployments@2025
   dependsOn: [
     modelDeployment
   ]
+}
+
+// ── Identity / RBAC ──────────────────────────
+
+@description('Principal ID of the deploying user. If provided, assigns Cognitive Services User role.')
+param principalId string = ''
+
+// Cognitive Services User — grants full data-plane access including Responses API
+var cognitiveServicesUserRoleId = 'a97b65f3-24c7-4388-baec-2e87135dc908'
+
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(principalId)) {
+  name: guid(aiFoundry.id, principalId, cognitiveServicesUserRoleId)
+  scope: aiFoundry
+  properties: {
+    principalId: principalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', cognitiveServicesUserRoleId)
+    principalType: 'User'
+  }
 }
 
 // ──────────────────────────────────────────────
