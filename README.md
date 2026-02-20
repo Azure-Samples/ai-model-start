@@ -126,7 +126,7 @@ All five examples follow the same pattern:
 
 **Why the standard OpenAI SDK?**
 
-The Foundry project endpoint is OpenAI-compatible. By appending `/openai` and passing the `api-version` as a query parameter, you can use the standard `openai` library in any language — no `azure-ai-projects`, `AzureOpenAI`, or `Azure.AI.OpenAI` wrapper needed. This works for all model providers (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more).
+The Foundry endpoint is OpenAI-compatible. By appending `/openai` and passing the `api-version` as a query parameter, you can use the standard `openai` library in any language — no `azure-ai-projects`, `AzureOpenAI`, or `Azure.AI.OpenAI` wrapper needed. This works for all model providers (OpenAI, DeepSeek, Meta, xAI, Microsoft, and more).
 
 ### Python code sample
 

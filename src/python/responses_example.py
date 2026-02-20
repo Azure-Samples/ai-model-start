@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
 Microsoft Foundry Models - Responses API Example (Plain OpenAI SDK)
-Uses the standard openai.OpenAI client with the project endpoint + /openai suffix.
-No dependency on azure.ai.projects.
+Uses the standard OpenAI client with the Foundry project endpoint.
 """
 
 import os
