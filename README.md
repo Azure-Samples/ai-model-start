@@ -6,40 +6,7 @@ Call **any Foundry models** — GPT, DeepSeek, Grok, Llama, and more — using *
 
 Includes working examples in **Python, TypeScript, C#, Java, and Go**.
 
-```mermaid
-block-beta
-    columns 5
-    sdkTitle["OpenAI SDKs (Stable)"]:5
-    py["🐍 Python"] ts["📘 TypeScript"] cs["🟪 C#"] java["☕ Java"] go["🩵 Go"]
-    space:5
-    space:1 arrow["⚡ GA OpenAI Responses API"]:3 space:1
-    space:1 auth["🔐 EntraID Keyless Auth · Zero Secrets"]:3 space:1
-    space:5
-    foundryTitle["Microsoft Foundry Models"]:5
-    deepseek["DeepSeek R1"] grok["xAI Grok"] llama["Meta Llama"] msft["Microsoft Phi"] oai["OpenAI GPT"]
-
-    py --> arrow
-    ts --> arrow
-    cs --> arrow
-    java --> arrow
-    go --> arrow
-    arrow --> foundryTitle
-
-    style sdkTitle fill:#1a1a2e,color:#e0e0ff,font-weight:bold,stroke:#6c63ff,stroke-width:2px
-    style foundryTitle fill:#1a1a2e,color:#e0e0ff,font-weight:bold,stroke:#e94560,stroke-width:2px
-    style arrow fill:#16213e,color:#ffd460,font-weight:bold,stroke:#ffd460,stroke-width:2px
-    style auth fill:#0d3320,color:#4ade80,font-weight:bold,stroke:#22c55e,stroke-width:2px
-    style py fill:#3572A5,color:#fff,stroke:#4a8cc7,stroke-width:1px
-    style ts fill:#3178c6,color:#fff,stroke:#4a9ae0,stroke-width:1px
-    style cs fill:#9b4dca,color:#fff,stroke:#b366e0,stroke-width:1px
-    style java fill:#e76f00,color:#fff,stroke:#f09030,stroke-width:1px
-    style go fill:#00acd7,color:#fff,stroke:#33c4e8,stroke-width:1px
-    style deepseek fill:#2563eb,color:#fff,stroke:#5b8def,stroke-width:1px
-    style grok fill:#1d9bf0,color:#fff,stroke:#4db8f5,stroke-width:1px
-    style llama fill:#6366f1,color:#fff,stroke:#8b8df5,stroke-width:1px
-    style msft fill:#e94560,color:#fff,stroke:#f06e84,stroke-width:1px
-    style oai fill:#10a37f,color:#fff,stroke:#3dbf9a,stroke-width:1px
-```
+![Architecture: Standard OpenAI SDKs in 5 languages connect to any Foundry model via the GA Responses API with keyless auth](images/ai-model-start-arch.png)
 
 ## Prerequisites
 
@@ -240,14 +207,6 @@ azd up
 azd env set AZURE_MODEL_NAME "gpt-4.1-mini"
 azd env set AZURE_MODEL_FORMAT "OpenAI"
 azd env set AZURE_MODEL_VERSION "2025-04-14"
-azd up
-```
-
-### Example: Phi-4
-
-```bash
-azd env set AZURE_MODEL_NAME "Phi-4"
-azd env set AZURE_MODEL_FORMAT "Microsoft"
 azd up
 ```
 
