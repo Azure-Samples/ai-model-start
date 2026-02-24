@@ -26,6 +26,25 @@ Includes working examples in **Python, TypeScript, C#, Java, and Go**.
 
 ![Architecture: Standard OpenAI SDKs in 5 languages connect to any Foundry model via the GA Responses API with keyless auth](images/ai-model-start-arch.png)
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Next Steps](#next-steps)
+- [What This Template Includes](#what-this-template-includes)
+- [What You Get](#what-you-get)
+- [Template Structure](#template-structure)
+- [Language-specific SDK dependencies](#language-specific-sdk-dependencies)
+- [Configuration](#configuration)
+- [Outputs](#outputs)
+- [Common Commands](#common-commands)
+- [Alternative Regions](#alternative-regions)
+- [How Do I Find Which Foundry Models Support Responses and Where?](#how-do-i-find-which-foundry-models-support-responses-and-where)
+- [Known Issues](#known-issues)
+- [Troubleshooting](#troubleshooting)
+- [Why This Template?](#why-this-template)
+- [Foundry Models with Responses API Support](#foundry-models-with-responses-api-support)
+
 ## Prerequisites
 
 - [Azure Subscription](https://azure.microsoft.com/pricing/purchase-options/azure-account)
