@@ -1,3 +1,21 @@
+<!--
+---
+page_type: sample
+languages:
+- python
+- typescript
+- go
+- csharp
+- java
+products:
+- azure-openai
+- azure
+- microsoft-foundry
+urlFragment: ai-model-start
+name: The AI Model Starter Kit
+description: Call any Foundry models - GPT, DeepSeek, Grok, Llama, and more - using stable OpenAI SDKs and the GA OpenAI Responses API. Production grade, enterprise friendly and secure with EntraID keyless authentication - no API keys, and zero secrets to manage. Includes working examples in Python, TypeScript, C#, Java, and Go.
+---
+-->
 # The AI Model Starter Kit
 
 The fastest way to get started with building apps using **any AI model**.
