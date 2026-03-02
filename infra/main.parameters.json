@@ -32,6 +32,18 @@
     "deployment2Name": {
       "value": "${AZURE_MODEL_2_DEPLOYMENT_NAME=}"
     },
+    "model3Name": {
+      "value": "${AZURE_MODEL_3_NAME=gpt-oss-120b}"
+    },
+    "model3Format": {
+      "value": "${AZURE_MODEL_3_FORMAT=OpenAI-OSS}"
+    },
+    "model3Version": {
+      "value": "${AZURE_MODEL_3_VERSION=1}"
+    },
+    "deployment3Name": {
+      "value": "${AZURE_MODEL_3_DEPLOYMENT_NAME=}"
+    },
     "principalId": {
       "value": "${AZURE_PRINCIPAL_ID}"
     }

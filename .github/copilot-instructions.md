@@ -2,9 +2,9 @@
 
 ## Architecture
 
-This is an **Azure Developer CLI (azd) template** that deploys a Microsoft Foundry account with two models (DeepSeek-R1-0528 and gpt-4.1-mini by default) and provides working examples in **Python, TypeScript, C#, Java, and Go** to call them.
+This is an **Azure Developer CLI (azd) template** that deploys a Microsoft Foundry account with three models (DeepSeek-R1-0528, gpt-4.1-mini, and gpt-oss-120b by default) and provides working examples in **Python, TypeScript, C#, Java, and Go** to call them.
 
-- **Infra layer** (`infra/`): Subscription-scoped Bicep. [main.bicep](../infra/main.bicep) creates the resource group and delegates to [foundry.bicep](../infra/foundry.bicep), which provisions `Microsoft.CognitiveServices/accounts` (kind `AIServices`), a project sub-resource, and model deployments (primary + optional secondary).
+- **Infra layer** (`infra/`): Subscription-scoped Bicep. [main.bicep](../infra/main.bicep) creates the resource group and delegates to [foundry.bicep](../infra/foundry.bicep), which provisions `Microsoft.CognitiveServices/accounts` (kind `AIServices`), a project sub-resource, and model deployments (primary + optional secondary + optional third).
 - **App layer** (`src/`): One self-contained example per language, each using the **Responses API** with that language's standard **OpenAI SDK** (not Azure-specific SDK wrappers). There is no web app, API server, or deployment target — only local scripts.
 - **Glue**: [azure.yaml](../azure.yaml) wires azd to the Bicep infra. Environment variables flow from Bicep outputs → azd env → app code via `os.environ` (or equivalent).
 
@@ -107,15 +107,16 @@ Set from `azd env get-values` after provisioning:
 - `AZURE_AI_PROJECT_ENDPOINT` — the project endpoint; used as `base_url` with `/openai/v1` suffix
 - `AZURE_MODEL_DEPLOYMENT_NAME` — primary model deployment name (default: `DeepSeek-R1-0528`); read by samples for example 2
 - `AZURE_MODEL_2_DEPLOYMENT_NAME` — second model deployment name (default: `gpt-4.1-mini`); read by all samples for example 1
+- `AZURE_MODEL_3_DEPLOYMENT_NAME` — third model deployment name (default: `gpt-oss-120b`)
 
-Sample code reads model names from `AZURE_MODEL_DEPLOYMENT_NAME` and `AZURE_MODEL_2_DEPLOYMENT_NAME` env vars, falling back to `DeepSeek-R1-0528` and `gpt-4.1-mini` respectively if not set.
+Sample code reads model names from `AZURE_MODEL_DEPLOYMENT_NAME`, `AZURE_MODEL_2_DEPLOYMENT_NAME`, and `AZURE_MODEL_3_DEPLOYMENT_NAME` env vars, falling back to `DeepSeek-R1-0528`, `gpt-4.1-mini`, and `gpt-oss-120b` respectively if not set.
 
 ### Bicep conventions
 - Target scope is `subscription` in `main.bicep`; resource-group-scoped resources go in `foundry.bicep` module.
 - API version: `2025-06-01` for all `Microsoft.CognitiveServices` resources.
 - Resource naming uses `uniqueString(subscription().id, environmentName, location)` for uniqueness.
-- **Model deployments are in Bicep** — defined in `foundry.bicep` as `Microsoft.CognitiveServices/accounts/deployments` resources with `@2025-06-01` API version. Primary deployment is unconditional; secondary uses `if (!empty(model2Name))` conditional.
-- The second model deployment is optional — set `AZURE_MODEL_2_NAME` to empty string to skip it.
+- **Model deployments are in Bicep** — defined in `foundry.bicep` as `Microsoft.CognitiveServices/accounts/deployments` resources with `@2025-06-01` API version. Primary deployment is unconditional; secondary and third use `if (!empty(modelNName))` conditional.
+- The second and third model deployments are optional — set `AZURE_MODEL_2_NAME` or `AZURE_MODEL_3_NAME` to empty string to skip them.
 
 ## Developer Workflow
 

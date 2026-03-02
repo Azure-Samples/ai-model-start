@@ -59,7 +59,7 @@ Includes working examples in **Python, TypeScript, C#, Java, and Go**.
 az login
 azd auth login
 
-# 2. Deploy DeepSeek-R1-0528 and gpt-4.1-mini to Microsoft Foundry
+# 2. Deploy DeepSeek-R1-0528, gpt-4.1-mini, and gpt-oss-120b to Microsoft Foundry
 azd up
 ```
 
@@ -156,7 +156,7 @@ print(response.output_text)
 
 ## What This Template Includes
 
-- **Core Infrastructure**: Microsoft Foundry account + project with two model deployments
+- **Core Infrastructure**: Microsoft Foundry account + project with three model deployments
 - **Optimal Configuration**: GlobalStandard SKU, flexible region and model selection
 - **Secure Authentication**: EntraID (keyless) via `DefaultAzureCredential` — no API keys or secrets to manage
 - **Multi-language examples**: Python, TypeScript, C#, Java, and Go — all using their standard OpenAI SDK
@@ -231,6 +231,12 @@ Model deployments are defined in Bicep and created automatically during `azd up`
 | `AZURE_MODEL_2_DEPLOYMENT_NAME` | Same as model name | Custom deployment name for second model |
 | `AZURE_MODEL_2_SKU_NAME` | `GlobalStandard` | Second model SKU tier |
 | `AZURE_MODEL_2_SKU_CAPACITY` | `10` | Second model capacity |
+| `AZURE_MODEL_3_NAME` | `gpt-oss-120b` | Third model to deploy (empty string to skip) |
+| `AZURE_MODEL_3_FORMAT` | `OpenAI-OSS` | Third model format |
+| `AZURE_MODEL_3_VERSION` | `1` | Third model version |
+| `AZURE_MODEL_3_DEPLOYMENT_NAME` | Same as model name | Custom deployment name for third model |
+| `AZURE_MODEL_3_SKU_NAME` | `GlobalStandard` | Third model SKU tier |
+| `AZURE_MODEL_3_SKU_CAPACITY` | `10` | Third model capacity |
 
 ### Example: DeepSeek-R1-0528 (Default)
 
@@ -267,6 +273,7 @@ After `azd up`, available via `azd env get-values`:
 | `AZURE_AI_PROJECT_ENDPOINT` | Project endpoint URL (use as `base_url` with `/openai/v1` suffix) |
 | `AZURE_MODEL_DEPLOYMENT_NAME` | Primary model deployment name |
 | `AZURE_MODEL_2_DEPLOYMENT_NAME` | Second model deployment name |
+| `AZURE_MODEL_3_DEPLOYMENT_NAME` | Third model deployment name |
 
 ## Common Commands
 

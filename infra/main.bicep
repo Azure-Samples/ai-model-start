@@ -83,6 +83,26 @@ param deployment2SkuName string = 'GlobalStandard'
 @description('SKU capacity for the secondary deployment.')
 param deployment2SkuCapacity int = 10
 
+// ── Third model deployment parameters ────
+
+@description('Name of the third model to deploy. Leave empty to skip.')
+param model3Name string = 'gpt-oss-120b'
+
+@description('Format of the third model.')
+param model3Format string = 'OpenAI-OSS'
+
+@description('Version of the third model.')
+param model3Version string = '1'
+
+@description('Custom name for the third deployment. Defaults to the model name.')
+param deployment3Name string = ''
+
+@description('SKU name for the third deployment.')
+param deployment3SkuName string = 'GlobalStandard'
+
+@description('SKU capacity for the third deployment.')
+param deployment3SkuCapacity int = 10
+
 // ── Identity / RBAC ──────────────────────────
 
 @description('Principal ID of the deploying user. azd populates this automatically.')
@@ -101,6 +121,7 @@ var effectiveFoundryName = !empty(aiFoundryName) ? aiFoundryName : 'foundry-${re
 var effectiveProjectName = !empty(aiProjectName) ? aiProjectName : '${effectiveFoundryName}-proj'
 var effectiveDeploymentName = !empty(deploymentName) ? deploymentName : modelName
 var effectiveDeployment2Name = !empty(deployment2Name) ? deployment2Name : model2Name
+var effectiveDeployment3Name = !empty(deployment3Name) ? deployment3Name : model3Name
 var effectiveTags = union(tags, { 'azd-env-name': environmentName })
 
 // ──────────────────────────────────────────────
@@ -137,6 +158,12 @@ module foundry 'foundry.bicep' = {
     deployment2Name: effectiveDeployment2Name
     deployment2SkuName: deployment2SkuName
     deployment2SkuCapacity: deployment2SkuCapacity
+    model3Name: model3Name
+    model3Format: model3Format
+    model3Version: model3Version
+    deployment3Name: effectiveDeployment3Name
+    deployment3SkuName: deployment3SkuName
+    deployment3SkuCapacity: deployment3SkuCapacity
     principalId: principalId
   }
 }
@@ -152,3 +179,4 @@ output AZURE_AI_PROJECT_NAME string = foundry.outputs.aiProjectName
 output AZURE_AI_PROJECT_ENDPOINT string = '${foundry.outputs.aiFoundryEndpoint}api/projects/${foundry.outputs.aiProjectName}'
 output AZURE_MODEL_DEPLOYMENT_NAME string = effectiveDeploymentName
 output AZURE_MODEL_2_DEPLOYMENT_NAME string = effectiveDeployment2Name
+output AZURE_MODEL_3_DEPLOYMENT_NAME string = effectiveDeployment3Name

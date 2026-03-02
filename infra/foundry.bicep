@@ -52,6 +52,25 @@ param deployment2SkuName string = 'GlobalStandard'
 @description('SKU capacity for the secondary deployment.')
 param deployment2SkuCapacity int = 10
 
+// ── Third model deployment parameters ───
+@description('Name of the third model to deploy. Leave empty to skip.')
+param model3Name string = ''
+
+@description('Format of the third model.')
+param model3Format string = 'OpenAI'
+
+@description('Version of the third model.')
+param model3Version string = ''
+
+@description('Name for the third deployment.')
+param deployment3Name string = ''
+
+@description('SKU name for the third deployment.')
+param deployment3SkuName string = 'GlobalStandard'
+
+@description('SKU capacity for the third deployment.')
+param deployment3SkuCapacity int = 10
+
 // ──────────────────────────────────────────────
 // Microsoft Foundry account
 //   A CognitiveServices/account with kind 'AIServices'
@@ -138,6 +157,29 @@ resource model2Deployment 'Microsoft.CognitiveServices/accounts/deployments@2025
   }
   dependsOn: [
     modelDeployment
+  ]
+}
+
+// ──────────────────────────────────────────────
+// Third model deployment (optional)
+// ──────────────────────────────────────────────
+
+resource model3Deployment 'Microsoft.CognitiveServices/accounts/deployments@2025-06-01' = if (!empty(model3Name)) {
+  parent: aiFoundry
+  name: !empty(deployment3Name) ? deployment3Name : model3Name
+  sku: {
+    capacity: deployment3SkuCapacity
+    name: deployment3SkuName
+  }
+  properties: {
+    model: {
+      name: model3Name
+      format: model3Format
+      version: !empty(model3Version) ? model3Version : null
+    }
+  }
+  dependsOn: [
+    model2Deployment
   ]
 }
 
