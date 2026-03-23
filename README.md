@@ -47,7 +47,7 @@ Includes working examples in **Python, TypeScript, C#, Java, and Go**.
 
 ## Prerequisites
 
-- [Azure Subscription](https://azure.microsoft.com/pricing/purchase-options/azure-account)
+- [Azure Subscription](https://azure.microsoft.com/pricing/purchase-options/azure-account?cid=msft_learn)
 - [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
 - [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)
 - One or more of: Python 3.9+, Node.js 18+, .NET 8+, Java 21+, Go 1.23+
