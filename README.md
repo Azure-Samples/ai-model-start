@@ -85,7 +85,7 @@ Get-Content .env | ForEach-Object { if ($_ -match '^([^#=]+)=(.*)$') { [Environm
 
 ### Run an example
 
-Each example calls both an **OpenAI model** (gpt-4.1-mini) and a **non-OpenAI model** (DeepSeek-R1-0528) using the Responses API.
+Each example calls both an **OpenAI model** (gpt-4.1-mini) and a **non-OpenAI reasoning model** (DeepSeek-R1-0528) using the Responses API. When the model emits structured reasoning items, each example prints the model's reasoning summary alongside the final answer — using the same in-schema shape (`output[].type == "reasoning"` with `summary[].text`) regardless of model family.
 
 **Python**
 ```bash
