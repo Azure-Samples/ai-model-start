@@ -85,7 +85,7 @@ Get-Content .env | ForEach-Object { if ($_ -match '^([^#=]+)=(.*)$') { [Environm
 
 ### Run an example
 
-Each example calls both an **OpenAI model** (gpt-4.1-mini) and a **non-OpenAI model** (DeepSeek-R1-0528) using the Responses API.
+Each example calls both an **OpenAI model** (gpt-4.1-mini) and a **non-OpenAI reasoning model** (DeepSeek-R1-0528) using the Responses API. When the model emits structured reasoning items, each example prints the model's reasoning summary alongside the final answer — using the same in-schema shape (`output[].type == "reasoning"` with `summary[].text`) regardless of model family.
 
 **Python**
 ```bash
@@ -332,6 +332,8 @@ python list_models_with_responses_api_support.py --non-openai --locations
 | ~~[Preview API version required](https://github.com/Azure-Samples/ai-model-start/issues/2)~~ | ~~`/openai/v1` endpoint previously only accepted `api-version=2025-11-15-preview`.~~ | **Resolved** — The `/openai/v1` path is now GA and doesn't require an `api-version` parameter at all. |
 | ~~[Java SDK `putQueryParam` bug](https://github.com/Azure-Samples/ai-model-start/issues/3)~~ | ~~`openai-java` `putQueryParam("api-version", ...)` silently drops the query parameter, causing `400: API version not supported` errors with EntraID auth.~~ | **Resolved** — All examples now use `/openai/v1` base URL which doesn't need `api-version`. |
 | [API key endpoint limitation](https://github.com/Azure-Samples/ai-model-start/issues/5) | The account-level API key endpoint (`/openai/v1`) does not support the Responses API for non-OpenAI models. | This template uses **EntraID authentication** with the project endpoint, which supports all models. |
+| [DeepSeek-R1-0528 reasoning summary](https://github.com/Azure-Samples/ai-model-start/issues/12) | The `reasoning` output item is emitted on roughly half of identical-prompt requests, and `usage.output_tokens_details.reasoning_tokens` reports `0` even when summary text is present. | Templates handle the missing-item case gracefully (no `Reasoning summary:` block when absent). Treat DeepSeek reasoning tokens as opaque cost. |
+| [o4-mini reasoning summary text](https://github.com/Azure-Samples/ai-model-start/issues/13) | Setting `reasoning={"summary":"auto"\|"concise"\|"detailed"}` returns HTTP 400 with an upstream OpenAI organization-verification error. Without that parameter, the `reasoning` item is emitted but `summary[].text` is empty. | Use `reasoning={"effort":"low"\|"medium"\|"high"}` to control reasoning compute — this is accepted without verification and `reasoning_tokens` reflects the chosen effort. Recovering human-readable summary text requires OpenAI org verification, which Foundry customers may not have access to. |
 
 ## Troubleshooting
 
