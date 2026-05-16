@@ -91,6 +91,12 @@ public class ResponsesExample {
                 .build();
 
         // --- Example 1: OpenAI model (gpt-4.1-mini) ---
+        // Note: gpt-4.1-mini is not a reasoning model. If you swap in an OpenAI
+        // reasoning model (o4-mini, o3, gpt-5.x), set .reasoning(Reasoning.builder()
+        // .effort(Reasoning.Effort.MEDIUM).build()) on ResponseCreateParams to control
+        // reasoning compute. Recovering human-readable summary text via
+        // Reasoning.summary currently requires OpenAI organization verification —
+        // see https://github.com/Azure-Samples/ai-model-start/issues/13.
         String openaiModel = System.getenv().getOrDefault("AZURE_MODEL_2_DEPLOYMENT_NAME", "gpt-4.1-mini");
         System.out.printf("Example 1: OpenAI model (%s)%n%n", openaiModel);
         System.out.println("Waiting for response...");
