@@ -7,7 +7,7 @@
     "start": "npx tsx responses_example.ts"
   },
   "dependencies": {
-    "@azure/identity": "^4.0.0",
+    "@azure/identity": "^4.13.1",
     "openai": "^6.22.0"
   },
   "devDependencies": {
