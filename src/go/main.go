@@ -86,6 +86,12 @@ func main() {
 	)
 
 	// --- Example 1: OpenAI model (gpt-4.1-mini) ---
+	// Note: gpt-4.1-mini is not a reasoning model. If you swap in an OpenAI
+	// reasoning model (o4-mini, o3, gpt-5.x), set Reasoning with an Effort level
+	// (low/medium/high) on ResponseNewParams to control reasoning compute.
+	// Recovering human-readable summary text via Reasoning.Summary currently
+	// requires OpenAI organization verification — see
+	// https://github.com/Azure-Samples/ai-model-start/issues/13.
 	openaiModel := os.Getenv("AZURE_MODEL_2_DEPLOYMENT_NAME")
 	if openaiModel == "" {
 		openaiModel = "gpt-4.1-mini"

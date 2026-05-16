@@ -35,6 +35,12 @@ var client = new OpenAIClient(
     new OpenAIClientOptions { Endpoint = new Uri(baseUrl) });
 
 // --- Example 1: OpenAI model (gpt-4.1-mini) ---
+// Note: gpt-4.1-mini is not a reasoning model. If you swap in an OpenAI
+// reasoning model (o4-mini, o3, gpt-5.x), set ReasoningOptions with an effort
+// level (low/medium/high) on CreateResponseOptions to control reasoning compute.
+// Recovering human-readable summary text via ReasoningOptions.Summary currently
+// requires OpenAI organization verification — see
+// https://github.com/Azure-Samples/ai-model-start/issues/13.
 var openaiModel = Environment.GetEnvironmentVariable("AZURE_MODEL_2_DEPLOYMENT_NAME") ?? "gpt-4.1-mini";
 Console.WriteLine($"Example 1: OpenAI model ({openaiModel})\n");
 Console.WriteLine("Waiting for response...");
